@@ -42,8 +42,9 @@ rankings <- rankGenes(expression_matrix)
 
 # Score samples using all gene sets
 scores <- list(rs1_genes, rs2_genes, rs3_genes, rs4_genes) %>%
-    purrr::map(~simpleScore(rankings, .)) %>%
-    setNames(c("RS1", "RS2", "RS3", "RS4"))
+    purrr::map(~simpleScore(rankings, .)$TotalScore) %>%
+    setNames(c("RS1", "RS2", "RS3", "RS4")) %>%
+    purrr::bind_rows(scores)
 
 # Apply model
 predictions <- predict(rs_model, scores)
