@@ -43,7 +43,7 @@ rankings <- rankGenes(expression_matrix)
 # Score samples using all gene sets
 scores <- list(rs1_genes, rs2_genes, rs3_genes, rs4_genes) %>%
     purrr::map(~simpleScore(rankings, .)$TotalScore) %>%
-    setNames(c("RS1", "RS2", "RS3", "RS4")) %>%
+    setNames(c("UpScore__rna_subtype1", "UpScore__rna_subtype2", "UpScore__rna_subtype3", "UpScore__rna_subtype4")) %>%
     purrr::bind_rows(scores)
 
 # Apply model
