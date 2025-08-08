@@ -6,10 +6,10 @@ This repository contains a predictive model and associated gene sets for classif
 
 - Prediction model
 - Gene sets:
-    - RS1 gene signature
-    - RS2 gene signature
-    - RS3 gene signature
-    - RS4 gene signature
+  - RS1 gene signature
+  - RS2 gene signature
+  - RS3 gene signature
+  - RS4 gene signature
 - Usage vignette
 
 ## Installation
@@ -42,8 +42,13 @@ rankings <- rankGenes(expression_matrix)
 
 # Score samples using all gene sets
 scores <- list(rs1_genes, rs2_genes, rs3_genes, rs4_genes) %>%
+    # calculate raw scores
     purrr::map(~simpleScore(rankings, .)$TotalScore) %>%
+    # scale the scores (if needed)
+    purrr::map(~scale(.)) %>%
+    # correct the names
     setNames(c("UpScore__rna_subtype1", "UpScore__rna_subtype2", "UpScore__rna_subtype3", "UpScore__rna_subtype4")) %>%
+    # combine into a data frame
     purrr::bind_rows(scores)
 
 # Apply model
