@@ -1,12 +1,21 @@
 ###########################################################################
 #
-#                            muller_multiomic_subtype_associations
+#                       Multiomic Subtype Associations
 #
 ###########################################################################
-# Author: Matthew Muller
-# Date: 2024-09-22
-# Script Name: muller_multiomic_subtype_associations
-# Output directory:
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Multiomic Subtype Associations analysis for ISCHEMIA study
+#
+
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
+
+# Load required packages
+# TODO: Update this list based on actual packages used in the script
+# load_packages(c("package1", "package2"))
+
 experiment <- "muller_multiomic_subtype_associations_reviewer_comments"
 outdir <- file.path("output", experiment)
 dir.create(outdir, showWarnings = FALSE)

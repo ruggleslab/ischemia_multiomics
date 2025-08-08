@@ -1,15 +1,20 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## ISCHEMIA Validation in PACE
+###########################################################################
+#
+#                       PACE Validation
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: PACE Validation analysis for ISCHEMIA study
+#
 
-## OTHER POTENTIAL VALIDATION DATA SETS:
-# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE202625
-# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE180083
-# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE180082
-# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE180081
-# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE103182
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
+
+# Load required packages
+# TODO: Update this list based on actual packages used in the script
+# load_packages(c("package1", "package2"))
 
 source("../code/overlap_finder_function.R")
 source("../code/summarize_table_function.R")

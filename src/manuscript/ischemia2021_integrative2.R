@@ -1,47 +1,58 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## ISCHEMIA Integrative Analysis
+###########################################################################
+#
+#                       Integrative2
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Integrative2 analysis for ISCHEMIA study
+#
 
-## Load in Libraries
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
+
+# Load required packages
+# TODO: Update this list based on actual packages used in the script
+# load_packages(c("package1", "package2"))
+
 packagelist = c("Hmisc", "tools", "psych")
 junk <- lapply(packagelist, function(xxx) suppressMessages(
   require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_plotting_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/rnaseq_scripts/geneset_analysis_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/WGCNA_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/process_metadata_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_survival_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/summarize_table_function.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/overlap_finder_function.R")
+# source("# EXTERNAL_FUNCTION: mgc_plotting_functions.R")
+# source("# EXTERNAL_FUNCTION: rnaseq_scripts/geneset_analysis_functions.R")
+# source("# EXTERNAL_FUNCTION: WGCNA_functions.R")
+# source("# EXTERNAL_FUNCTION: process_metadata_functions.R")
+# source("# EXTERNAL_FUNCTION: mgc_survival_functions.R")
+# source("# EXTERNAL_FUNCTION: summarize_table_function.R")
+# source("# EXTERNAL_FUNCTION: overlap_finder_function.R")
 
 
 ## Outpath
-# outfilepathintegration = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/")
-outfilepathintegration = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run3/")
+# outfilepathintegration = create_output_dir("analysis_output")
+outfilepathintegration = create_output_dir("analysis_output")
 dir.create(outfilepathintegration, recursive = TRUE, showWarnings = FALSE)
 
 ## Infiles:
-metatable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/rna_processing/metatable_in.csv"
+metatable_file <- file.path(DATA_DIR, "metatable_in.csv")
 metatable <- read.table(metatable_file, sep = ",", header = TRUE, row.names = 1)
-biorepfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/docs/isch_BiorepData_10_26_2021.csv"
+biorepfile <- "# PATH_UPDATED: docs/isch_BiorepData_10_26_2021.csv"
 bioreptable <- read.table(biorepfile, header = TRUE, sep = ",", check.names = FALSE, stringsAsFactors = FALSE)
 rownames(bioreptable) <- bioreptable[,"PATNUM"]
 ## Selecting here the metaCOI we want to grab in later analyses.
 # metaCOI <- c(colnames(metatable)[colnames(metatable) %in% colnames(bioreptable)])
 metaCOI <- c(colnames(metatable)[colnames(metatable) %in% colnames(bioreptable)], "SMOKSTAT", "RVBPDIA", "RVBPSYS")
 
-# rna_clustermembership_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/NMF/rnaseq_only_run2/nmf_clustermembership_table.csv"
-rna_clustermembership_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/MULTIOMICS_SUBTYPE_LABELS/nmf_cluster_labels_with_subcluster_1_20220208.csv"
+# rna_clustermembership_table_file <- "# PATH_UPDATED: output/run3_rmoutliers2/NMF/rnaseq_only_run2/nmf_clustermembership_table.csv"
+rna_clustermembership_table_file <- "# PATH_UPDATED: data/MULTIOMICS_SUBTYPE_LABELS/nmf_cluster_labels_with_subcluster_1_20220208.csv"
 rna_clustermembership_table <- read.table(rna_clustermembership_table_file, sep = ",", header = TRUE, row.names = 1)
 rna_clustermembership_table <- rna_clustermembership_table[!is.na(rna_clustermembership_table[,"combined"]),]
 # rna_clustermembership_table[,"combined"] <- apply(rna_clustermembership_table, 1, function(x) paste(na.omit(x)))
 # write.table(rna_clustermembership_table, paste0(outfilepathintegration, "RNA_cluster_membership_table.csv"), sep = ",", row.names = TRUE, col.names = NA)
 
-# meth_clustermembership_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/K_means_cluster_group.csv"
-meth_clustermembership_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/MULTIOMICS_SUBTYPE_LABELS/meth_cluster_membership_table_2_20220210.csv"
+# meth_clustermembership_table_file <- "# PATH_UPDATED: data/K_means_cluster_group.csv"
+meth_clustermembership_table_file <- "# PATH_UPDATED: data/MULTIOMICS_SUBTYPE_LABELS/meth_cluster_membership_table_2_20220210.csv"
 meth_clustermembership_table <- read.table(meth_clustermembership_table_file, sep = ",", header = TRUE, row.names = 1)
 
 ## Have to add sex back to this - because those are separate for male and female............. so I guess make them F1 and M1..?
@@ -65,12 +76,12 @@ SOImeth <- unique(rownames(meth_clustermembership_table))
 SOIboth <- intersect(rownames(rna_clustermembership_table), rownames(meth_clustermembership_table))
 
 # Counttable:
-normcounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/rna_processing/normcounttab.txt"
+normcounttable_file <- file.path(DATA_DIR, "normcounttab.txt")
 normcounttable <- read.table(normcounttable_file, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 # WGCNA
-eigengenecounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv"
+eigengenecounttable_file <- "# PATH_UPDATED: output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv"
 eigengenecounttable <- read.table(eigengenecounttable_file, sep = ",", header = TRUE, row.names = 1)
-genestocolorstab_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_genestocolors.csv"
+genestocolorstab_file <- "# PATH_UPDATED: output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_genestocolors.csv"
 genestocolorstab <- read.table(genestocolorstab_file, ",", header = TRUE, row.names = 1)
 eigengenes <- paste0("ME",
                      c("magenta", "salmon", "purple", "midnightblue", "turquoise", 
@@ -779,7 +790,7 @@ junk <- dev.off()
 
 
 ## Heatmap of eigengene values - with annotation of nmf cluster (and maybe annotation for nmf cluster driver for modules??)
-rnacluster_eigen_ranktable_temp <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run3/wgcna_nmf_integration/boxplots_nmfcluster_allsamples/nmfcluster_allsamples_eigenrank_summary_table.csv", sep = ",", header = TRUE, row.names = 1)
+rnacluster_eigen_ranktable_temp <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run3/wgcna_nmf_integration/boxplots_nmfcluster_allsamples/nmfcluster_allsamples_eigenrank_summary_table.csv", sep = ",", header = TRUE, row.names = 1)
 # Rank table
 rnacluster_eigen_ranktable_temp2 <- dcast(rnacluster_eigen_ranktable_temp, Group ~ eigengene, value.var = "Eigen_Score_Rank")
 rnacluster_eigen_ranktable <- data.frame(t(rnacluster_eigen_ranktable_temp2[,2:ncol(rnacluster_eigen_ranktable_temp2)]))
@@ -1051,7 +1062,7 @@ junk <- dev.off()
 # 
 # 
 # ## Summary heatmap of the pvals
-# # fullstatouttablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/integrative_analyses/nmf_survival_analysis/full_survival_pval_table.csv"
+# # fullstatouttablefile <- "# PATH_UPDATED: output/run1c_rmoutliers2/integrative_analyses/nmf_survival_analysis/full_survival_pval_table.csv"
 # # fullstatouttable <- read.table(fullstatouttablefile, sep = ",", header = TRUE, row.names = 1)
 # fullstatouttable <- fullpvalouttable
 # 

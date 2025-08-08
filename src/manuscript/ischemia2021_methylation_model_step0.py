@@ -1,14 +1,17 @@
 ###########################################################################
 #
-#                            muller_methylation_model
+#                            ISCHEMIA Methylation Model - Step 0
 #
 ###########################################################################
 # Author: Matthew Muller
-# Date: 2025-07-21
-# Script Name: muller_methylation_model
+# Date: 2025-08-08
+# Script Name: muller_methylation_model_step0.py
+# Description: Methylation-based prediction model training for ISCHEMIA data
+#
+# This script performs feature selection and model training on methylation
+# data for predicting clinical outcomes in the ISCHEMIA study.
 
 # ======================== SETUP ========================
-# General libaries
 import os
 import sys
 import time
@@ -19,6 +22,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import json
+from pathlib import Path
 
 # Modeling libraries
 from sklearn import base
@@ -33,21 +37,28 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import skore
 
-# Custom libraries
-from MattTools import utils
+# Set random seed for reproducibility
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
 
-## Set up directories
-# Root directory
-root_dir = os.getcwd()
+# Set up directories
+project_root = Path.cwd()
+if "src" in str(project_root):
+    project_root = project_root.parent
+
 # Output directory
-experiment = "muller_methylation_model"
-outdir = os.path.join(root_dir, "output", experiment) + "/"
+experiment = "methylation_model"
+output_dir = project_root / "output" / experiment
+output_dir.mkdir(parents=True, exist_ok=True)
 
-# Create output directory if it doesn't exist
-if not os.path.exists(outdir):
-    os.makedirs(outdir)
+# Data directory
+data_dir = project_root / "data"
 
-## Set up some general items
+print(f"Project root: {project_root}")
+print(f"Output directory: {output_dir}")
+print(f"Data directory: {data_dir}")
+
+# ======================== CONFIGURATION ========================
 # Set random seed
 utils.set_random_seed(420)
 # Hide warnings

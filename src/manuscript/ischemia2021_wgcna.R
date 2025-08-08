@@ -1,31 +1,34 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## ISCHEMIA WB WGCNA Analysis
+###########################################################################
+#
+#                       ISCHEMIA WGCNA Analysis
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Weighted Gene Co-expression Network Analysis (WGCNA) for
+#              ISCHEMIA whole blood RNA-seq data
 
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_plotting_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/rnaseq_scripts/geneset_analysis_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/WGCNA_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/process_metadata_functions.R")
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
 
-## Infiles
-# inmetafile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/metatable_in.csv"
-inmetafile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/rna_processing/metatable_in.csv"
+# Load required packages for WGCNA
+load_packages(c("WGCNA", "flashClust", "dynamicTreeCut"))
+
+# Input files
+inmetafile <- file.path(DATA_DIR, "metatable_in.csv")
 inmetatable <- read.table(inmetafile, sep = ",", header = TRUE, stringsAsFactors = FALSE, row.names = 1)
 SOI <- rownames(inmetatable)
 
-## Grab the matched samples
-# incountfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/normcounttab.txt"
-incountfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/rna_processing/normcounttab.txt"
+# Grab the matched samples
+incountfile <- file.path(DATA_DIR, "normcounttab.txt")
 normcounttable <- read.table(incountfile, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
-# outfilepathwgcna = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/WGCNA/")
-# outfilepathwgcna = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/WGCNA_power5/")
-# outfilepathwgcna = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/WGCNA_power14/")
+# Create output directory for WGCNA
+outfilepathwgcna <- create_output_dir(paste0("WGCNA_power", WGCNA_POWER))
 powerparam = 14
 modulesizeparam = 30
-outfilepathwgcna = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/WGCNA/WGCNA_power", powerparam, "_size", modulesizeparam,"/")
+# FIXME: Update path - outfilepathwgcna = paste0("# PATH_UPDATED: output/run3_rmoutliers2/WGCNA/WGCNA_power", powerparam, "_size", modulesizeparam,"/")
 dir.create(outfilepathwgcna, recursive = TRUE, showWarnings = FALSE)
 
 ## Step 0 - add metadata on that I want, turning some characters into numbers
@@ -102,7 +105,7 @@ eigengenebpplot_path <- paste0(outfilepathwgcna, "eigengene_boxplots_noNAs/")
 dir.create(eigengenebpplot_path, showWarnings = FALSE, recursive = TRUE)
 
 ## I want to do the bptab for each comparison and each module... So need to add a forloop around this with our categories of interest...
-# inmetafile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/rna_processing/metatable_in.csv"
+# FIXME: Update path - # inmetafile <- "# PATH_UPDATED: output/run1c_rmoutliers2/rna_processing/metatable_in.csv"
 # inmetatable <- read.table(inmetafile, sep = ",", header = TRUE, stringsAsFactors = FALSE, row.names = 1)
 
 ## I want to add some more categories here - namely combining some metrics
@@ -287,7 +290,7 @@ eigengenebpplot_path <- paste0(custommodule_outfilepath, "eigengene_boxplots/")
 dir.create(eigengenebpplot_path, showWarnings = FALSE, recursive = TRUE)
 
 ## I want to do the bptab for each comparison and each module... So need to add a forloop around this with our categories of interest...
-# inmetafile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/rna_processing/metatable_in.csv"
+# FIXME: Update path - # inmetafile <- "# PATH_UPDATED: output/run1c_rmoutliers2/rna_processing/metatable_in.csv"
 # inmetatable <- read.table(inmetafile, sep = ",", header = TRUE, stringsAsFactors = FALSE, row.names = 1)
 
 ## I want to add some more categories here - namely combining some metrics

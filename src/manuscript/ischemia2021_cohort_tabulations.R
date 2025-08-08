@@ -1,35 +1,35 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## ISCHEMIA Cohort Characteristic Tabulations
+###########################################################################
+#
+#                         ISCHEMIA Cohort Characteristic Tabulations
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Analysis of cohort characteristics and tabulations
+#
 
-## Load in Libraries
-packagelist = c("Hmisc", "tools")
-junk <- lapply(packagelist, function(xxx) suppressMessages(
-  require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
 
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_plotting_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/summarize_table_function.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/overlap_finder_function.R")
+# Load required packages
+load_packages(c("Hmisc", "tools"))
 
-## Outpath
-outfilepathstats = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/cohort_tabulations/")
-dir.create(outfilepathstats, recursive = TRUE, showWarnings = FALSE)
+# Create output directory for cohort tabulations
+outfilepathstats <- create_output_dir("cohort_tabulations")
 
-## Infiles
-inmetafile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/metatable_in.csv"
+# Input files
+inmetafile <- file.path(DATA_DIR, "metatable_in.csv")
 inmetatable <- read.table(inmetafile, sep = ",", header = TRUE, stringsAsFactors = FALSE, row.names = 1)
 # SOI <- rownames(na.omit(inmetatable[,"comp_ischemia__Sev_v_MildNone",drop=FALSE]))
 SOI <- rownames(inmetatable)
 
-## Grab the matched samples
-incountfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/normcounttab.txt"
+# Grab the matched samples
+incountfile <- file.path(DATA_DIR, "normcounttab.txt")
 normcounttable <- read.table(incountfile, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
-## What about comparing it to the biomarker data...
-inbiomarkertable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biomarker_data_cleaned_20210325.csv"
-# inbiomarkertable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biomarker_data_cleaned_20210211.csv"
+# Compare to biomarker data
+inbiomarkertable_file <- BIOMARKER_FILE
 inbiomarkertable <- read.table(inbiomarkertable_file, sep = ",", header = TRUE)
 biomarkerlabels <- colnames(inbiomarkertable)[grepl("_clean", colnames(inbiomarkertable))]
 
@@ -37,8 +37,8 @@ inbiomarkertable <- inbiomarkertable[rowSums(is.na(inbiomarkertable)) != (ncol(i
                                      grepl("_clean|PATNUM", colnames(inbiomarkertable))]
 
 # Metabalomics table
-inmetabalomics_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/ischemia_metabalomics_simplified_withID_cleaned_duplicates.csv"
-# inmetabalomics_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/ischemia_metabalomics_simplified_withID_table.csv"
+# FIXME: Update path - inmetabalomics_file <- "# PATH_UPDATED: data/ischemia_metabalomics_simplified_withID_cleaned_duplicates.csv"
+# FIXME: Update path - # inmetabalomics_file <- "# PATH_UPDATED: data/ischemia_metabalomics_simplified_withID_table.csv"
 inmetabalomics_table <- read.table(inmetabalomics_file, sep = ",", header = TRUE, check.names = FALSE)
 ## Ok, 230 is kind of arbitrary, but that seems to be the magic cut off number, and then the rest we can assess as a case by case basis
 inmetabalomics_table <- inmetabalomics_table[rowSums(is.na(inmetabalomics_table))<230, ]
@@ -46,7 +46,7 @@ inmetabalomics_table <- inmetabalomics_table[rowSums(is.na(inmetabalomics_table)
 inmetabalomics_table[inmetabalomics_table == "TAG"] <- NA
 
 # Methylation table
-inmethylfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/top100k_vars_probes_rm_dupe_XY.rds"
+# FIXME: Update path - inmethylfile <- "# PATH_UPDATED: data/top100k_vars_probes_rm_dupe_XY.rds"
 # inmethylfile <- "/gpfs/data/ischemialab/projects/nmf_multiomics_clustering/data/top100k_vars_probes_rm_dupe_XY.rds"
 topmethyltable <- readRDS(file = inmethylfile)
 #load(file = inmethyl_file) # Loads methyltable_convertedIDs
@@ -61,7 +61,7 @@ topmethyltable <- topmethyltable[names(methylvariances)[1:numbermethylsites],]
 
 
 # Full biorep table
-inbioreptablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biorep_10_27.csv"
+# FIXME: Update path - inbioreptablefile <- "# PATH_UPDATED: data/biorep_10_27.csv"
 inbioreptable <- read.table(inbioreptablefile, sep = ",", header = TRUE, stringsAsFactors = FALSE, check.names = FALSE, na.strings = c("NA", "", NA))
 
 ## Ok, to start off with, lets get an idea of what I have to work with from each data set - and what the overlap of the datatypes are...

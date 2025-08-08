@@ -1,12 +1,21 @@
 ###########################################################################
 #
-#                            muller_pace_validation_edits
+#                       Pace Validation Edits
 #
 ###########################################################################
-# Author: Matthew Muller
-# Date: 2024-02-04
-# Script Name: muller_pace_validation_edits
-# Output directory:
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Pace Validation Edits analysis for ISCHEMIA study
+#
+
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
+
+# Load required packages
+# TODO: Update this list based on actual packages used in the script
+# load_packages(c("package1", "package2"))
+
 experiment <- "muller_pace_validation_edits"
 outdir <- file.path("output", paste0(experiment))
 dir.create(outdir, showWarnings = F)

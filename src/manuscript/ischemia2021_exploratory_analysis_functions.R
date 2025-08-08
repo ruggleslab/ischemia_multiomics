@@ -1,18 +1,37 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## ISCHEMIA Subtype Analysis
+###########################################################################
+#
+#                            ISCHEMIA Exploratory Analysis Functions
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: 2025-08-08
+# Script Name: ischemia2021_exploratory_analysis_functions.R
+# Description: Common functions for ISCHEMIA exploratory data analysis
+#
+# This file contains utility functions for:
+# - Metadata processing and variable creation
+# - Statistical analysis functions
+# - Plotting functions for exploratory analysis
+# - Survival analysis utilities
 
-## Load in Libraries
-packagelist = c("NMF", "Hmisc", "tools", "caret", "blacksheepr", "mlbench", "caret", "pROC", "WGCNA", "multiROC", "scattermore", "dendextend")
-junk <- lapply(packagelist, function(xxx) suppressMessages(
-    require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
+# ======================== SETUP ========================
+# Load required packages
+required_packages <- c(
+    "NMF", "Hmisc", "tools", "caret", "blacksheepr", "mlbench", 
+    "pROC", "WGCNA", "multiROC", "scattermore", "dendextend", 
+    "survival", "tidyverse"
+)
 
-source("../code/mgc_plotting_functions.R")
-source("../code/process_metadata_functions.R")
-source("../code/mgc_survival_functions.R")
-source("../code/WGCNA_functions.R")
+# Load packages (assumes utils.R has been sourced)
+if (exists("load_packages")) {
+    load_packages(required_packages)
+} else {
+    lapply(required_packages, function(pkg) {
+        suppressMessages(require(pkg, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE))
+    })
+}
+
+# ======================== METADATA PROCESSING FUNCTIONS ========================
 
 # --------------------------------- Add on and edit the biorep table --------------------------------- 
 
@@ -1268,7 +1287,7 @@ cluster_NONBINARY_vs_event_kmanalysis_summary_heatmap <- function(selected_clust
     write.table(fullcohortNouttable, paste0(outfilepathsurvival, "full_survival_cohortN_table.csv"), sep = ",", col.names = NA, row.names = TRUE)
     
     ## Summary heatmap of the pvals
-    # fullstatouttablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/integrative_analyses/nmf_survival_analysis/full_survival_pval_table.csv"
+    # fullstatouttablefile <- "# PATH_UPDATED: output/run1c_rmoutliers2/integrative_analyses/nmf_survival_analysis/full_survival_pval_table.csv"
     # fullstatouttable <- read.table(fullstatouttablefile, sep = ",", header = TRUE, row.names = 1)
     fullstatouttable <- fullpvalouttable
     

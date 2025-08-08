@@ -1,38 +1,35 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## Traditional Metric comparisons - comapring DGE and GSEA across imaging, anatomy, and duke score - seeing if traditional metrics can detect useful changes.
+###########################################################################
+#
+#           Traditional Metric Comparisons - DGE and GSEA Analysis
+#
+###########################################################################
+# Author: ISCHEMIA Study Team  
+# Date: Updated 2025-08-08
+# Description: Comparing DGE and GSEA across imaging, anatomy, and duke score
+#              to see if traditional metrics can detect useful changes.
 
-## Load in Libraries
-packagelist = c("Hmisc", "tools")
-junk <- lapply(packagelist, function(xxx) suppressMessages(
-  require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
 
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_plotting_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/rnaseq_scripts/geneset_analysis_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/WGCNA_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/process_metadata_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_survival_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/summarize_table_function.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/overlap_finder_function.R")
+# Load required packages
+load_packages(c("Hmisc", "tools"))
 
-## Outpath
-outfilepathdgecomp = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/dge_comparison/")
-dir.create(outfilepathdgecomp, recursive = TRUE, showWarnings = FALSE)
+# Create output directory for DGE comparisons
+outfilepathdgecomp <- create_output_dir("dge_comparison")
 
-## Infiles
-inmetafile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/metatable_in.csv"
+# Input files
+inmetafile <- file.path(DATA_DIR, "metatable_in.csv")
 inmetatable <- read.table(inmetafile, sep = ",", header = TRUE, stringsAsFactors = FALSE, row.names = 1)
 # SOI <- rownames(na.omit(inmetatable[,"comp_ischemia__Sev_v_MildNone",drop=FALSE]))
 SOI <- rownames(inmetatable)
 
 ## Grab the matched samples
-incountfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/normcounttab.txt"
+# FIXME: Update path - incountfile <- "# PATH_UPDATED: output/run2b_rmoutliers2_controlage/rna_processing/normcounttab.txt"
 normcounttable <- read.table(incountfile, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
 ## Full metafile read in - to grab some more info...
-inbioreptablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biorep_10_27.csv"
+# FIXME: Update path - inbioreptablefile <- "# PATH_UPDATED: data/biorep_10_27.csv"
 inbioreptable <- read.table(inbioreptablefile, sep = ",", header = TRUE, stringsAsFactors = FALSE, check.names = FALSE, na.strings = c("NA", "", NA))
 # extraCOI <- c("PATNUM",
 #               "HEMOGLOB", "PLATELET", "WBC",
@@ -44,18 +41,18 @@ inbioreptable <- read.table(inbioreptablefile, sep = ",", header = TRUE, strings
 # addonmetatable <- addonmetatable[,!grepl("PATNUM", colnames(addonmetatable))]
 
 ## Read in all of the DGE Files
-deseq_imaging_file <-"/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/deseq/comp_ischemia__Sev_v_MildNone/deseq_results_comp_ischemia__Sev_v_MildNone.csv"
+# FIXME: Update path - deseq_imaging_file <-"# PATH_UPDATED: output/run2b_rmoutliers2_controlage/deseq/comp_ischemia__Sev_v_MildNone/deseq_results_comp_ischemia__Sev_v_MildNone.csv"
 deseq_imaging_table <- read.table(deseq_imaging_file, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
-deseq_anatomy_file <-"/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/deseq/comp_anatomy__3v_v_1v/deseq_results_comp_anatomy__3v_v_1v.csv"
+# FIXME: Update path - deseq_anatomy_file <-"# PATH_UPDATED: output/run2b_rmoutliers2_controlage/deseq/comp_anatomy__3v_v_1v/deseq_results_comp_anatomy__3v_v_1v.csv"
 deseq_anatomy_table <- read.table(deseq_anatomy_file, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
-deseq_duke_file <-"/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/deseq/comp_duke__67_v_3/deseq_results_comp_duke__67_v_3.csv"
+# FIXME: Update path - deseq_duke_file <-"# PATH_UPDATED: output/run2b_rmoutliers2_controlage/deseq/comp_duke__67_v_3/deseq_results_comp_duke__67_v_3.csv"
 deseq_duke_table <- read.table(deseq_duke_file, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
 
-gseaHALL_imaging_file <-"/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/gsea/comp_ischemia__Sev_v_MildNone/comp_ischemia__Sev_v_MildNone_gsea_HALL.csv"
+# FIXME: Update path - gseaHALL_imaging_file <-"# PATH_UPDATED: output/run2b_rmoutliers2_controlage/gsea/comp_ischemia__Sev_v_MildNone/comp_ischemia__Sev_v_MildNone_gsea_HALL.csv"
 gseaHALL_imaging_table <- read.table(gseaHALL_imaging_file, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
-gseaHALL_anatomy_file <-"/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/gsea/comp_anatomy__3v_v_1v/comp_anatomy__3v_v_1v_gsea_HALL.csv"
+# FIXME: Update path - gseaHALL_anatomy_file <-"# PATH_UPDATED: output/run2b_rmoutliers2_controlage/gsea/comp_anatomy__3v_v_1v/comp_anatomy__3v_v_1v_gsea_HALL.csv"
 gseaHALL_anatomy_table <- read.table(gseaHALL_anatomy_file, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
-gseaHALL_duke_file <-"/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/gsea/comp_duke__67_v_3/comp_duke__67_v_3_gsea_HALL.csv"
+# FIXME: Update path - gseaHALL_duke_file <-"# PATH_UPDATED: output/run2b_rmoutliers2_controlage/gsea/comp_duke__67_v_3/comp_duke__67_v_3_gsea_HALL.csv"
 gseaHALL_duke_table <- read.table(gseaHALL_duke_file, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
 
 

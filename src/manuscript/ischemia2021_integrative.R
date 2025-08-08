@@ -1,49 +1,60 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## ISCHEMIA Integrative Analysis
+###########################################################################
+#
+#                       Integrative
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Integrative analysis for ISCHEMIA study
+#
 
-## Load in Libraries
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
+
+# Load required packages
+# TODO: Update this list based on actual packages used in the script
+# load_packages(c("package1", "package2"))
+
 packagelist = c("Hmisc", "tools", "psych")
 junk <- lapply(packagelist, function(xxx) suppressMessages(
     require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
 
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_plotting_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/rnaseq_scripts/geneset_analysis_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/WGCNA_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/process_metadata_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_survival_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/summarize_table_function.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/overlap_finder_function.R")
+# source("# EXTERNAL_FUNCTION: mgc_plotting_functions.R")
+# source("# EXTERNAL_FUNCTION: rnaseq_scripts/geneset_analysis_functions.R")
+# source("# EXTERNAL_FUNCTION: WGCNA_functions.R")
+# source("# EXTERNAL_FUNCTION: process_metadata_functions.R")
+# source("# EXTERNAL_FUNCTION: mgc_survival_functions.R")
+# source("# EXTERNAL_FUNCTION: summarize_table_function.R")
+# source("# EXTERNAL_FUNCTION: overlap_finder_function.R")
 
 ## Outpath
-# outfilepathintegration = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/integrative_analyses/")
-# outfilepathintegration = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2a_rmoutliers2_controlagesex/integrative_analyses/")
-outfilepathintegration = paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/integrative_analyses/")
+# outfilepathintegration = create_output_dir("analysis_output")
+# outfilepathintegration = create_output_dir("analysis_output")
+outfilepathintegration = create_output_dir("analysis_output")
 dir.create(outfilepathintegration, recursive = TRUE, showWarnings = FALSE)
 
 ## Infiles
-inmetafile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/metatable_in.csv"
+inmetafile <- file.path(DATA_DIR, "metatable_in.csv")
 inmetatable <- read.table(inmetafile, sep = ",", header = TRUE, stringsAsFactors = FALSE, row.names = 1)
 # SOI <- rownames(na.omit(inmetatable[,"comp_ischemia__Sev_v_MildNone",drop=FALSE]))
 SOI <- rownames(inmetatable)
 
 ## Grab the matched samples
-incountfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/normcounttab.txt"
+incountfile <- file.path(DATA_DIR, "normcounttab.txt")
 normcounttable <- read.table(incountfile, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
 ## So lets start simple, do the WGCNA info and nmf cluster info look interesting at all when put together????????
-# wgcna_eigengenes_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/WGCNA_power14/wgcna_eigengenes.csv"
-wgcna_eigengenes_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/WGCNA/WGCNA_power16_size40/wgcna_eigengenes.csv"
+# wgcna_eigengenes_tablefile <- "# PATH_UPDATED: output/run2b_rmoutliers2_controlage/WGCNA_power14/wgcna_eigengenes.csv"
+wgcna_eigengenes_tablefile <- "# PATH_UPDATED: output/run2b_rmoutliers2_controlage/WGCNA/WGCNA_power16_size40/wgcna_eigengenes.csv"
 wgcna_eigengenes_table <- read.table(wgcna_eigengenes_tablefile, sep = ",", header = TRUE, row.names = 1)
 eigengenes <- colnames(wgcna_eigengenes_table)
 
-nmf_clustermembership_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/NMF/test_run2/nmf_clustermembership_table.csv"
-# nmf_clustermembership_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/NMF_bp/try5_newmethylation_rmDMPsex1_rnamethonly/rank_4_nmf/nmf_clustermembership_table.csv"
+nmf_clustermembership_tablefile <- "# PATH_UPDATED: output/run1c_rmoutliers2/NMF/test_run2/nmf_clustermembership_table.csv"
+# nmf_clustermembership_tablefile <- "# PATH_UPDATED: output/run2b_rmoutliers2_controlage/NMF_bp/try5_newmethylation_rmDMPsex1_rnamethonly/rank_4_nmf/nmf_clustermembership_table.csv"
 nmf_clustermembership_table <- read.table(nmf_clustermembership_tablefile, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
-nmf_clustercores_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/NMF/test_run2/nmf_clustercores_table.csv"
-# nmf_clustercores_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/NMF_bp/try5_newmethylation_rmDMPsex1_rnamethonly/rank_4_nmf/nmf_clustercores_table.csv"
+nmf_clustercores_tablefile <- "# PATH_UPDATED: output/run1c_rmoutliers2/NMF/test_run2/nmf_clustercores_table.csv"
+# nmf_clustercores_tablefile <- "# PATH_UPDATED: output/run2b_rmoutliers2_controlage/NMF_bp/try5_newmethylation_rmDMPsex1_rnamethonly/rank_4_nmf/nmf_clustercores_table.csv"
 nmf_clustercores_table <- read.table(nmf_clustercores_tablefile, sep = ",", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
 
 nmf_clustermembership_table[,"combined"] <- apply(nmf_clustermembership_table, 1, function(x) paste(na.omit(x)))
@@ -53,7 +64,7 @@ nmfcluster_allsamples = nmf_clustermembership_table[,"combined",drop=FALSE]
 
 ## Full metafile read in - to grab some more info...
 # Apparently there is no CBC? So lets use what we have at least that may be relevant:
-inbioreptablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biorep_10_27.csv"
+inbioreptablefile <- "# PATH_UPDATED: data/biorep_10_27.csv"
 inbioreptable <- read.table(inbioreptablefile, sep = ",", header = TRUE, stringsAsFactors = FALSE, check.names = FALSE, na.strings = c("NA", "", NA))
 extraCOI <- c("PATNUM",
               "HEMOGLOB", "PLATELET", "WBC",
@@ -498,7 +509,7 @@ write.table(fullcumhazouttable, paste0(outfilepathsurvival, "full_survival_cumha
 
 
 ## Summary heatmap of the pvals
-# fullstatouttablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/integrative_analyses/nmf_survival_analysis/full_survival_pval_table.csv"
+# fullstatouttablefile <- "# PATH_UPDATED: output/run1c_rmoutliers2/integrative_analyses/nmf_survival_analysis/full_survival_pval_table.csv"
 # fullstatouttable <- read.table(fullstatouttablefile, sep = ",", header = TRUE, row.names = 1)
 fullstatouttable <- fullpvalouttable
 
@@ -624,7 +635,7 @@ junk <- dev.off()
 # wgcna_eigengenes_table ## table we need
 
 # nmfcluster_allsamples ## sample annotation
-nmfeigenranktable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run1c_rmoutliers2/integrative_analyses/wgcna_nmf_integration/boxplots_nmfcluster_allsamples/nmfcluster_allsamples_eigenrank_summary_table.csv"
+nmfeigenranktable_file <- "# PATH_UPDATED: output/run1c_rmoutliers2/integrative_analyses/wgcna_nmf_integration/boxplots_nmfcluster_allsamples/nmfcluster_allsamples_eigenrank_summary_table.csv"
 eigenrank_summarytable <- read.table(nmfeigenranktable_file, sep = ",", header = TRUE, row.names = 1)
 
 ## If I want to only do drivers:
@@ -693,10 +704,10 @@ outfilepathtabulation <- paste0(outfilepathintegration, "nmf_cluster_tabulations
 dir.create(outfilepathtabulation, showWarnings = FALSE, recursive = TRUE)
 
 # Created a key, use the coltype for the character classes when reading in the biorep table
-inbioreptable_keyfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biorep_10_27_question_key.txt"
+inbioreptable_keyfile <- "# PATH_UPDATED: data/biorep_10_27_question_key.txt"
 inbioreptable_key <- read.table(inbioreptable_keyfile, sep = "\t", header = TRUE, stringsAsFactors = FALSE, na.strings = c("NA", "", NA))
 
-inbioreptablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biorep_10_27.csv"
+inbioreptablefile <- "# PATH_UPDATED: data/biorep_10_27.csv"
 inbioreptable <- read.table(inbioreptablefile, sep = ",", header = TRUE, stringsAsFactors = FALSE, check.names = FALSE,
                             na.strings = c("NA", "", NA),
                             colClasses = inbioreptable_key[,"coltype"]
@@ -861,7 +872,7 @@ write.table(statouttable_full, paste0(outfilepathtabulation, "COI_tabulations/",
 
 
 ## What about comparing it to the biomarker data...
-inbiomarkertable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biomarker_data_cleaned_20210211.csv"
+inbiomarkertable_file <- BIOMARKER_FILE
 inbiomarkertable <- read.table(inbiomarkertable_file, sep = ",", header = TRUE)
 biomarkerlabels <- colnames(inbiomarkertable)[grepl("_clean", colnames(inbiomarkertable))]
 
@@ -945,23 +956,23 @@ write.table(metasummarytable, paste0(outfilepathintegration, "IMGMETRIC_analysis
 # ETTST1DP	ETTST2DP	ETTAGEPHR - ETT
 ## with raw gene expression, and also EIGENgene expression
 ## Grab the matched samples
-incountfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/rna_processing/normcounttab.txt"
+incountfile <- file.path(DATA_DIR, "normcounttab.txt")
 normcounttable <- read.table(incountfile, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
 ## eigengenes
-# wgcna_eigengenes_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/WGCNA_power14/wgcna_eigengenes.csv"
-wgcna_eigengenes_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run2b_rmoutliers2_controlage/WGCNA/WGCNA_power16_size40/wgcna_eigengenes.csv"
+# wgcna_eigengenes_tablefile <- "# PATH_UPDATED: output/run2b_rmoutliers2_controlage/WGCNA_power14/wgcna_eigengenes.csv"
+wgcna_eigengenes_tablefile <- "# PATH_UPDATED: output/run2b_rmoutliers2_controlage/WGCNA/WGCNA_power16_size40/wgcna_eigengenes.csv"
 wgcna_eigengenes_table <- read.table(wgcna_eigengenes_tablefile, sep = ",", header = TRUE, row.names = 1)
 eigengenes <- colnames(wgcna_eigengenes_table)
 
 ## POI Eigengenes
-# POI_eigengenes_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/figures/raw/run2_20210423/imaging/wgcna/POI_eigengene_tab.csv"
-POI_eigengenes_tablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/figures/raw/run2_20210423/imaging/wgcna/POI_expanded_eigengene_tab.csv"
+# POI_eigengenes_tablefile <- "# PATH_UPDATED: output/figures/raw/run2_20210423/imaging/wgcna/POI_eigengene_tab.csv"
+POI_eigengenes_tablefile <- "# PATH_UPDATED: output/figures/raw/run2_20210423/imaging/wgcna/POI_expanded_eigengene_tab.csv"
 POI_eigengenes_table <- read.table(POI_eigengenes_tablefile, sep = ",", header = TRUE, row.names = 1)
 POI_eigengenes <- colnames(POI_eigengenes_table)
 
 ## biorep table
-inbioreptablefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/biorep_10_27.csv"
+inbioreptablefile <- "# PATH_UPDATED: data/biorep_10_27.csv"
 inbioreptable <- read.table(inbioreptablefile, sep = ",", header = TRUE, stringsAsFactors = FALSE, check.names = FALSE, na.strings = c("NA", "", NA))
 
 # continuous imaging metrics

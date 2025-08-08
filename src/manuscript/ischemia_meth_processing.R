@@ -1,41 +1,51 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## Read in and format methylation data
+###########################################################################
+#
+#                       Ischemia Meth Processing
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Ischemia Meth Processing analysis for ISCHEMIA study
+#
 
-## Load in Libraries
-# options(scipen=999)
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
+
+# Load required packages
+# TODO: Update this list based on actual packages used in the script
+# load_packages(c("package1", "package2"))
+
 packagelist = c()
 junk <- lapply(packagelist, function(xxx) suppressMessages(
     require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
-source("/Users/tosh/Desktop/Ruggles_Lab/code/mgc_plotting_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/rnaseq_scripts/deseq_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/code/ischemia2021_exploratory_analysis_functions.R")
+# source("# EXTERNAL_FUNCTION: mgc_plotting_functions.R")
+# source("# EXTERNAL_FUNCTION: rnaseq_scripts/deseq_functions.R")
+# source("# PATH_UPDATED: code/ischemia2021_exploratory_analysis_functions.R")
 
 
 ## Outfilepath
-outfilepathmaster <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/"
-# outfilepathmaster <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/uncorrected_DMP/"
+outfilepathmaster <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/"
+# outfilepathmaster <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/uncorrected_DMP/"
 dir.create(outfilepathmaster, showWarnings = FALSE, recursive = TRUE)
 
 
 # --------------------------------- Read in Methylation Count Table and metadata table ---------------------------------
 # Read in meth count table and metatable
-methmetatable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/kpp_metadata.rds"
+methmetatable_file <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/kpp_metadata.rds"
 methmetatable <- readRDS(methmetatable_file)
-methcounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/limma_noCovariate.rds"
+methcounttable_file <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/limma_noCovariate.rds"
 methcounttable <- readRDS(methcounttable_file)
 colnames(methcounttable) <- methmetatable[match(methmetatable[,"Sample_Name"], colnames(methcounttable)), "Sample_Patnum"]
 methcounttable <- methcounttable[,-578] # Need to remove the duplicate of this sample: "048003-005", columns 204 and 578
 methmetatable <- methmetatable[-578,] # Need to remove the duplicate of this sample: "048003-005", columns 204 and 578
 
 # Colorguide
-colorguidefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/ischemia2021_colorguide.csv"
+colorguidefile <- "# PATH_UPDATED: data/ischemia2021_colorguide.csv"
 colorguide <- read.table(colorguidefile, sep = ",", header = TRUE, comment.char = "", colClasses = c("character", "character", "character"))
 
 # Meth cluster membership table
-meth_clustermembership_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/MULTIOMICS_SUBTYPE_LABELS/meth_cluster_membership_table_4_nodup_20220606.csv"
+meth_clustermembership_table_file <- "# PATH_UPDATED: data/MULTIOMICS_SUBTYPE_LABELS/meth_cluster_membership_table_4_nodup_20220606.csv"
 meth_clustermembership_table <- read.table(meth_clustermembership_table_file, sep = ",", header = TRUE, row.names = 1)
 
 
@@ -101,7 +111,7 @@ meth_annottable[,"DMP_methsubtype__methtype3_v_NOTmethtype3"] <- ifelse(meth_ann
 write.table(meth_annottable, paste0(outfilepathmaster, "custom_meth_metatable.csv"), sep = ",", col.names = NA, row.names = TRUE)
 
 ## Doublechecking the metadata from the DMP analyses:
-# infilepath <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20221006/with_asr_correction/"
+# infilepath <- "# PATH_UPDATED: data/methylation_data_20221006/with_asr_correction/"
 # metadata_file_vec <- list.files(infilepath)[grepl("metadata", list.files(infilepath))]
 # names(metadata_file_vec) <- c("AFIB_CUSTOM", "AFIBECG_CUSTOM", "CTNDV70", "IMGDEGIS", "kpp_cluster", "kpp_cluster")
 # metadata_check_list <- list()
@@ -121,7 +131,7 @@ write.table(meth_annottable, paste0(outfilepathmaster, "custom_meth_metatable.cs
 ## Read in the DMP file
 ## If it is multiple comparisons (like with the subtypes) - then split and analyze
 
-DMP_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/DMP_with_asr_correction/"
+DMP_path <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/DMP_with_asr_correction/"
 dmp_comp_list <- list(
     meth_AFIB_CUSTOM = c(filelabel = "limma_BCcorrected_DMP_on_AFIB_CUSTOM_control.rds", complabel = "limma_BCcorrected_DMP_on_AFIB_CUSTOM_control",
         c(pval_test = "P.Value", pval_cutoff = 0.05, log2fc_cutoff = 0.03), COI = "AFIB_CUSTOM", outlabel = "DMP_afib__afib_v_noafib"),
@@ -147,7 +157,7 @@ dmp_comp_list <- list(
 )
 
 
-# DMP_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/DMP_nocovar/"
+# DMP_path <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/DMP_nocovar/"
 # dmp_comp_list <- list(
 #     meth_AFIB_CUSTOM = c(filelabel = "limma_DMP_on_AFIB_CUSTOM_control.rds", complabel = "noAFIB_to_AFIB", 
 #         c(pval_test = "P.Value", pval_cutoff = 0.05, log2fc_cutoff = 0.03), COI = "AFIB_CUSTOM", outlabel = "DMP_afib__afib_v_noafib"),
@@ -334,7 +344,7 @@ for (dmp_comp in dmp_comp_list) {
 ## So can we run GSEA, but with probes aligned to genes
 ### TOSH - THIS IS ALL DONE AND DONT NEED TO DO AGAIN
 # Create the probe set reference table:
-# PSEA_reference_table_outfilepath <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/"
+# PSEA_reference_table_outfilepath <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/"
 # dir.create(PSEA_reference_table_outfilepath, showWarnings = FALSE, recursive = TRUE)
 # probe_set_out <- create_probe_set_reference(DMPtable, speciesparam = "Homo sapiens", genesetparam = "C5")
 # saveRDS(probe_set_out[["probe_set_table"]], paste0(PSEA_reference_table_outfilepath, "probe_set_C5_reftable.rds"))
@@ -346,12 +356,12 @@ for (dmp_comp in dmp_comp_list) {
 
 
 # probeset_enrichment_analysis(DMPtable = DMPtable, rankmetric = "logFC", pvalcutoffparam = 1, pvaltype = "P.Value",
-#                              existing_probe_ref_file = "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/probe_set_H_reftable.rds", probe_type_selection_list = NULL,
+#                              existing_probe_ref_file = "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/probe_set_H_reftable.rds", probe_type_selection_list = NULL,
 #                              genesetparam= "dummy", speciesparam = "dummy",
 #                              seedparam = 12345, customprobeset = NULL)
 
 # PSEA_out <- probeset_enrichment_analysis(DMPtable = DMPtable, rankmetric = "logFC", pvalcutoffparam = 1, pvaltype = "P.Value",
-#                              existing_probe_ref_file = "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/probe_set_H_reftable.rds", probe_type_selection_list = probe_type_selection_list,
+#                              existing_probe_ref_file = "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/probe_set_H_reftable.rds", probe_type_selection_list = probe_type_selection_list,
 #                              genesetparam= "dummy", speciesparam = "dummy",
 #                              seedparam = 12345, customprobeset = NULL)
 
@@ -395,12 +405,12 @@ sig_performace_check_fullsize_output_control_read_and_process <- function(rdsfil
 }
 
 dir.create(paste0(outfilepathmaster, "signature_ml_output/", "testresults/"), showWarnings = FALSE, recursive = TRUE)
-rdsfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20221006/ml_output/sig_performace_check_fullsize_output_control.rds"
+rdsfile <- "# PATH_UPDATED: data/methylation_data_20221006/ml_output/sig_performace_check_fullsize_output_control.rds"
 sig_performace_check_fullsize_output_control_read_and_process(rdsfile,
                                                               outfilepath = paste0(outfilepathmaster, "signature_ml_output/", "testresults/"))
 
 dir.create(paste0(outfilepathmaster, "signature_ml_output/", "trainresults/"), showWarnings = FALSE, recursive = TRUE)
-rdsfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20221006/ml_output/sig_performace_selfcheck_fullsize_output_control.rds"
+rdsfile <- "# PATH_UPDATED: data/methylation_data_20221006/ml_output/sig_performace_selfcheck_fullsize_output_control.rds"
 sig_performace_check_fullsize_output_control_read_and_process(rdsfile,
                                                               outfilepath = paste0(outfilepathmaster, "signature_ml_output/", "trainresults/"))
 
@@ -445,7 +455,7 @@ sig_performace_check_fullsize_output_control_read_and_process(rdsfile,
 
 
 # --------------------------------- Have to recalc the p.adjust for PSEA analyses ---------------------------------
-PSEA_filepath <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/PSEA/run2"
+PSEA_filepath <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/PSEA/run2"
 PSEA_files <- list.files(path = PSEA_filepath, pattern = "*_PSEA_*", recursive = TRUE)
 PSEA_files <- PSEA_files[!grepl("_CUSTOM_", PSEA_files)]
 for (PSEA_file in PSEA_files) {

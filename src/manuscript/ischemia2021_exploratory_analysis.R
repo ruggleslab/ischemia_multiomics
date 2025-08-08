@@ -1,20 +1,32 @@
-################################
-# Name: MacIntosh Cornwell
-# Email: mcornwell1957@gmail.com
-################################
-## ISCHEMIA Subtype Analysis
+###########################################################################
+#
+#                       Exploratory Analysis
+#
+###########################################################################
+# Author: ISCHEMIA Study Team
+# Date: Updated 2025-08-08
+# Description: Exploratory Analysis analysis for ISCHEMIA study
+#
+
+# Load configuration and utilities
+source("config.R")
+source("utils.R")
+
+# Load required packages
+# TODO: Update this list based on actual packages used in the script
+# load_packages(c("package1", "package2"))
 
 packagelist = c("psych")
 junk <- lapply(packagelist, function(xxx) suppressMessages(
     require(xxx, character.only = TRUE,quietly=TRUE,warn.conflicts = FALSE)))
-source("/Users/tosh/Desktop/Ruggles_Lab/code/overlap_finder_function.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/summarize_table_function.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/code/rnaseq_scripts/deseq_functions.R")
-source("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/code/ischemia2021_exploratory_analysis_functions.R")
+# source("# EXTERNAL_FUNCTION: overlap_finder_function.R")
+# source("# EXTERNAL_FUNCTION: summarize_table_function.R")
+# source("# EXTERNAL_FUNCTION: rnaseq_scripts/deseq_functions.R")
+# source("# PATH_UPDATED: code/ischemia2021_exploratory_analysis_functions.R")
 
 
 # Outfolder
-outfilepathmaster <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run9-figs/"
+outfilepathmaster <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run9-figs/"
 dir.create(outfilepathmaster, recursive = TRUE, showWarnings = FALSE)
 
 # save.image(file = paste0(outfilepathmaster, "/ischemia_exploratory.RData"))
@@ -23,12 +35,12 @@ dir.create(outfilepathmaster, recursive = TRUE, showWarnings = FALSE)
 
 # --------------------------------- Utility tables for colors and statistical cutoffs ---------------------------------
 # Colorguide
-colorguidefile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/ischemia2021_colorguide.csv"
+colorguidefile <- "# PATH_UPDATED: data/ischemia2021_colorguide.csv"
 colorguide <- read.table(colorguidefile, sep = ",", header = TRUE, comment.char = "", colClasses = c("character", "character", "character"))
 
 # Differential analysis cutoffs
 ## Ugly - but allows for easily adjusting cutoffs if we want
-diff_feat_analysis_cutoffs <- suppressWarnings(read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/diff_feat_analysis_cutoffs.csv",sep = ",", header = TRUE, row.names = 1))
+diff_feat_analysis_cutoffs <- suppressWarnings(read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/diff_feat_analysis_cutoffs.csv",sep = ",", header = TRUE, row.names = 1))
 comp_ischemia__Sev_v_MildNone__PVALTEST <- diff_feat_analysis_cutoffs["comp_ischemia__Sev_v_MildNone", "pval_test"]
 comp_ischemia__Sev_v_MildNone__PVALCUTOFF <- diff_feat_analysis_cutoffs["comp_ischemia__Sev_v_MildNone", "pval_cutoff"]
 comp_ischemia__Sev_v_MildNone__FCCUTOFF <- diff_feat_analysis_cutoffs["comp_ischemia__Sev_v_MildNone", "fc_cutoff"]
@@ -43,18 +55,18 @@ DMP_anatomy70__3v_v_1v__PVALCUTOFF <- diff_feat_analysis_cutoffs["DMP_anatomy70_
 DMP_anatomy70__3v_v_1v__FCCUTOFF <- diff_feat_analysis_cutoffs["DMP_anatomy70__3v_v_1v", "fc_cutoff"]
 
 # --------------------------------- Read in our metatable and bioreptable ---------------------------------
-metatable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/rna_processing/metatable_in.csv"
+metatable_file <- file.path(DATA_DIR, "metatable_in.csv")
 metatable <- read.table(metatable_file, sep = ",", header = TRUE, row.names = 1)
-biorepfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/isch_BiorepData_3_23_2022_CUSTOM.csv"
+biorepfile <- "# PATH_UPDATED: data/isch_BiorepData_3_23_2022_CUSTOM.csv"
 bioreptable <- read.table(biorepfile, header = TRUE, sep = ",", check.names = FALSE, stringsAsFactors = FALSE)
 rownames(bioreptable) <- bioreptable[,"PATNUM"]
 
-rna_clustermembership_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/MULTIOMICS_SUBTYPE_LABELS/nmf_cluster_labels_with_subcluster_1_20220208.csv"
+rna_clustermembership_table_file <- "# PATH_UPDATED: data/MULTIOMICS_SUBTYPE_LABELS/nmf_cluster_labels_with_subcluster_1_20220208.csv"
 rna_clustermembership_table <- read.table(rna_clustermembership_table_file, sep = ",", header = TRUE, row.names = 1)
 rna_clustermembership_table <- rna_clustermembership_table[!is.na(rna_clustermembership_table[,"rna_4cluster_w3AB"]),]
 rna_clustermembership_table <- rna_clustermembership_table[order(rna_clustermembership_table[,"rna_4cluster_w3AB"]),]
 
-meth_clustermembership_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/MULTIOMICS_SUBTYPE_LABELS/meth_cluster_membership_table_4_nodup_20220606.csv"
+meth_clustermembership_table_file <- "# PATH_UPDATED: data/MULTIOMICS_SUBTYPE_LABELS/meth_cluster_membership_table_4_nodup_20220606.csv"
 meth_clustermembership_table <- read.table(meth_clustermembership_table_file, sep = ",", header = TRUE, row.names = 1)
 meth_clustermembership_table <- meth_clustermembership_table[order(meth_clustermembership_table[,"meth_4cluster"]),]
 
@@ -72,19 +84,19 @@ SOIboth <- intersect(rownames(rna_clustermembership_table), rownames(meth_cluste
 SOIeither <- unique(c(rownames(rna_clustermembership_table), rownames(meth_clustermembership_table)))
 
 # Normalized counts
-normcounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/rna_processing/normcounttab.txt"
+normcounttable_file <- file.path(DATA_DIR, "normcounttab.txt")
 normcounttable <- read.table(normcounttable_file, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
 # biomarkertable attached to bioreptable:
-biomarkerfile <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/docs/ischemia_biomarkers/Marker_Meta_Joint_Dropdup_release.V1.2.csv"
+biomarkerfile <- "# PATH_UPDATED: docs/ischemia_biomarkers/Marker_Meta_Joint_Dropdup_release.V1.2.csv"
 biomarkertable <- read.table(biomarkerfile, sep = ",", header = TRUE, check.names = FALSE, stringsAsFactors = FALSE,
                              na.strings = c("", NA, "NA"))
 biomarkertable_sel <- biomarkertable[,c("PATNUM", colnames(biomarkertable)[grepl("_clean$", colnames(biomarkertable))])]
 
 # WGCNA
-eigengenecounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv"
+eigengenecounttable_file <- "# PATH_UPDATED: output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv"
 eigengenecounttable <- read.table(eigengenecounttable_file, sep = ",", header = TRUE, row.names = 1)
-genestocolorstab_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_genestocolors.csv"
+genestocolorstab_file <- "# PATH_UPDATED: output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_genestocolors.csv"
 genestocolorstab <- read.table(genestocolorstab_file, ",", header = TRUE, row.names = 1)
 eigengenes <- paste0("ME",
                      c("magenta", "salmon", "purple", "midnightblue", "turquoise", 
@@ -98,16 +110,16 @@ eigengenes <- paste0("ME",
 dir.create(paste0(outfilepathmaster, "meth_WGCNA/"), showWarnings = FALSE, recursive = TRUE)
 
 # Read in meth count table and metatable
-methmetatable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/kpp_metadata.rds"
+methmetatable_file <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/kpp_metadata.rds"
 methmetatable <- readRDS(methmetatable_file)
-methcounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/limma_noCovariate.rds"
+methcounttable_file <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/limma_noCovariate.rds"
 methcounttable <- readRDS(methcounttable_file)
 colnames(methcounttable) <- methmetatable[match(methmetatable[,"Sample_Name"], colnames(methcounttable)), "Sample_Patnum"]
 methcounttable <- methcounttable[,-578] # Need to remove the duplicate of this sample: "048003-005", columns 204 and 578
 
 # Read in format and output the meth annotation table
-meth_wgcna_annotation_goterm_table_list <- readRDS("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20221020/WGCNA_pathway_annotation_hypergeo.rds")
-meth_wgcna_genestocolors <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_wgcna_genestocolors.csv"), sep = ",", header = TRUE, row.names = 1)
+meth_wgcna_annotation_goterm_table_list <- readRDS("# PATH_UPDATED: data/methylation_data_20221020/WGCNA_pathway_annotation_hypergeo.rds")
+meth_wgcna_genestocolors <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_wgcna_genestocolors.csv"), sep = ",", header = TRUE, row.names = 1)
 
 # Add the adjusted p value and add the gene ratio value
 meth_wgcna_annotation_goterm_table_list <- lapply(meth_wgcna_annotation_goterm_table_list, function(x){
@@ -139,19 +151,19 @@ write.table(meth_wgcna_annotation_table[meth_wgcna_annotation_table[,"p.adjust"]
 
 # 119 entries long - DMP tables
 # they are fisher tests for another gene annotation, but idk what they are... so im gonna ignore for now...
-# meth_wgcna_annotation_fisher_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/WGCNA/WGCNA_pathway_annotation_fisher.rds"
+# meth_wgcna_annotation_fisher_table_file <- "# PATH_UPDATED: data/methylation_data_20220608/WGCNA/WGCNA_pathway_annotation_fisher.rds"
 # meth_wgcna_annotation_fisher_table <- readRDS(meth_wgcna_annotation_fisher_table_file)
 
 
 # # Ok well only the top (15?) have any annotation, so thats actuall easier to deal with...
 # # ok this looks more like an actual GO term annoation... for each module
-# meth_wgcna_annotation_goterm_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/WGCNA/WGCNA_pathway_annotation_Goterm.rds"
+# meth_wgcna_annotation_goterm_table_file <- "# PATH_UPDATED: data/methylation_data_20220608/WGCNA/WGCNA_pathway_annotation_Goterm.rds"
 # meth_wgcna_annotation_goterm_table_list <- readRDS(meth_wgcna_annotation_goterm_table_file)# also 119 long
 # 
 # 
 # 
 # # List where each entry is a module and the values in it are the probes in that module
-# meth_wgcna_ht_molecular_order_no0_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/WGCNA/WGCNA_ht_molecular_order_without0.rds"
+# meth_wgcna_ht_molecular_order_no0_file <- "# PATH_UPDATED: data/methylation_data_20220608/WGCNA/WGCNA_ht_molecular_order_without0.rds"
 # meth_wgcna_ht_molecular_order_no0 <- readRDS(meth_wgcna_ht_molecular_order_no0_file)
 # 
 # 
@@ -169,7 +181,7 @@ write.table(meth_wgcna_annotation_table[meth_wgcna_annotation_table[,"p.adjust"]
 # meth_wgcna_genestocolors[,"moduleColors"] <- labels2colors(meth_wgcna_genestocolors[,"moduleLabels"])
 # 
 # write.table(meth_wgcna_genestocolors, paste0(outfilepathmaster, "meth_WGCNA/", "meth_wgcna_genestocolors.csv"), sep = ",", col.names = NA, row.names = TRUE)
-# # meth_wgcna_genestocolors <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_wgcna_genestocolors.csv"), sep = ",", header = TRUE, row.names = 1)
+# # meth_wgcna_genestocolors <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_wgcna_genestocolors.csv"), sep = ",", header = TRUE, row.names = 1)
 # 
 # # 2 - use that to get an eigengene table (733x119) - NOT RUN FOR TIME AND SPACE REASONS
 # # meth_eigengenecounttable <- orderMEs(moduleEigengenes(t(methcounttable),
@@ -215,7 +227,7 @@ write.table(meth_wgcna_annotation_table[meth_wgcna_annotation_table[,"p.adjust"]
 
 
 
-# meth_wgcna_annotation_goterm_table_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/WGCNA_pathway_annotation_hypergeo.rds"
+# meth_wgcna_annotation_goterm_table_file <- "# PATH_UPDATED: data/WGCNA_pathway_annotation_hypergeo.rds"
 # meth_wgcna_annotation_goterm_table_list <- readRDS(meth_wgcna_annotation_goterm_table_file)# also 119 long
 # 
 # # Add the adjusted p value and add the gene ratio value
@@ -244,7 +256,7 @@ write.table(meth_wgcna_annotation_table[meth_wgcna_annotation_table[,"p.adjust"]
 
 # --------------------------------- WES CHIP Analysis read in and incorporation ---------------------------------
 # # Read in WES info
-# CHIP_sampleID_conversion_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230406/Sample_ID_with_PATNUM_ischemia_CUSTOM.csv",
+# CHIP_sampleID_conversion_table <- read.table("# PATH_UPDATED: farheen/chip_output_20230406/Sample_ID_with_PATNUM_ischemia_CUSTOM.csv",
 #                                              sep = ",", header = TRUE, na.strings = c("", "NA", NA, " "), check.names = FALSE, row.names = 1)
 # ## This sample is duplicated and causing issues - im gonna remove for now:
 # # 8002310725	11/16/22	036007-001	8002310725
@@ -252,9 +264,9 @@ write.table(meth_wgcna_annotation_table[meth_wgcna_annotation_table[,"p.adjust"]
 # CHIP_sampleID_conversion_table <- CHIP_sampleID_conversion_table[!rownames(CHIP_sampleID_conversion_table) %in% "8002310725",]
 # 
 # # CHIP mutation table
-# CHIP_mutation_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230406/CHIP_mutation_calls.csv",
+# CHIP_mutation_table <- read.table("# PATH_UPDATED: farheen/chip_output_20230406/CHIP_mutation_calls.csv",
 #                                              sep = ",", header = TRUE, na.strings = c("", "NA", NA, " "), check.names = FALSE, row.names = 1)
-# CHIP_mutation_table_PASS <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230406/CHIP_mutation_calls_PASS.csv",
+# CHIP_mutation_table_PASS <- read.table("# PATH_UPDATED: farheen/chip_output_20230406/CHIP_mutation_calls_PASS.csv",
 #                                              sep = ",", header = TRUE, na.strings = c("", "NA", NA, " "), check.names = FALSE, row.names = 1)
 # CHIP_mutation_table_combined <- merge(CHIP_mutation_table[,c("freq_of_CHIP_mutations", "PATNUM")],
 #                                       setNames(CHIP_mutation_table_PASS[,c("freq_of_CHIP_mutations", "PATNUM")], 
@@ -263,12 +275,12 @@ write.table(meth_wgcna_annotation_table[meth_wgcna_annotation_table[,"p.adjust"]
 # CHIP_mutation_table_combined[is.na(CHIP_mutation_table_combined[,"freq_of_CHIP_mutations_PASS"]),"freq_of_CHIP_mutations_PASS"] <- 0
 # 
 # # GAM variant tables
-# GAM_all_variant_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230406/GAM_all_variants.csv",
+# GAM_all_variant_table <- read.table("# PATH_UPDATED: farheen/chip_output_20230406/GAM_all_variants.csv",
 #                                              sep = ",", header = TRUE, na.strings = c("", "NA", NA, " "), check.names = FALSE, row.names = 1)
 # GAM_all_variant_table <- GAM_all_variant_table[!rownames(GAM_all_variant_table) %in% "8002310725",]
 # rownames(GAM_all_variant_table) <- CHIP_sampleID_conversion_table[
 #     rownames(GAM_all_variant_table)[rownames(GAM_all_variant_table) %in% rownames(CHIP_sampleID_conversion_table)], "PATNUM"]
-# GAM_all_variant_table_PASS <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230406/GAM_PASS_variants.csv",
+# GAM_all_variant_table_PASS <- read.table("# PATH_UPDATED: farheen/chip_output_20230406/GAM_PASS_variants.csv",
 #                                              sep = ",", header = TRUE, na.strings = c("", "NA", NA, " "), check.names = FALSE, row.names = 1)
 # GAM_all_variant_table_PASS <- GAM_all_variant_table_PASS[!rownames(GAM_all_variant_table_PASS) %in% "8002310725",]
 # rownames(GAM_all_variant_table_PASS) <- CHIP_sampleID_conversion_table[
@@ -286,9 +298,9 @@ write.table(meth_wgcna_annotation_table[meth_wgcna_annotation_table[,"p.adjust"]
 
 # CHIP mutation tables
 # Theres a duplicate error with these - so I am removing both of these for now: "036007-001", "36007-001"
-total_chip_mutant_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230413/correct_no_of_mutations_all.csv",
+total_chip_mutant_table <- read.table("# PATH_UPDATED: farheen/chip_output_20230413/correct_no_of_mutations_all.csv",
                                       sep = ",", header = TRUE)
-total_chip_mutant_table_PASS <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230413/correct_no_of_mutations_PASS.csv",
+total_chip_mutant_table_PASS <- read.table("# PATH_UPDATED: farheen/chip_output_20230413/correct_no_of_mutations_PASS.csv",
                                            sep = ",", header = TRUE)
 total_chip_mutant_table_combined <- merge(total_chip_mutant_table[,c("Freq", "PATNUM")],
                                           setNames(total_chip_mutant_table_PASS[,c("Freq", "PATNUM")], c("Freq_PASS", "PATNUM")),
@@ -296,10 +308,10 @@ total_chip_mutant_table_combined <- merge(total_chip_mutant_table[,c("Freq", "PA
 total_chip_mutant_table_combined[is.na(total_chip_mutant_table_combined[,"Freq_PASS"]),"Freq_PASS"] <- 0
 
 
-chip_variant_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230413/correct_variants_all.csv",
+chip_variant_table <- read.table("# PATH_UPDATED: farheen/chip_output_20230413/correct_variants_all.csv",
                                       sep = ",", header = TRUE)
 chip_variant_full_table <- dcast(chip_variant_table, PATNUM ~ Gene.refGene, fun.aggregate = length)
-chip_variant_table_PASS <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/farheen/chip_output_20230413/correct_variants_PASS.csv",
+chip_variant_table_PASS <- read.table("# PATH_UPDATED: farheen/chip_output_20230413/correct_variants_PASS.csv",
                                            sep = ",", header = TRUE)
 chip_variant_full_table_PASS <- dcast(chip_variant_table_PASS, PATNUM ~ Gene.refGene, fun.aggregate = length)
 colnames(chip_variant_full_table_PASS) <- c("PATNUM", paste0(colnames(chip_variant_full_table_PASS)[!colnames(chip_variant_full_table_PASS) %in% "PATNUM"], "_PASS"))
@@ -473,13 +485,13 @@ dir.create(paste0(outfilepathmaster, "clean_dge_figures/dge_gseaplots/"), showWa
 # Read in DESeq and GSEA results
 dge_comp_list <- c("comp_ischemia__Sev_v_MildNone", "comp_anatomy70__3v_v_1v")
 deseq_table_list <- list()
-deseq_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/deseq/"
+deseq_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/deseq/"
 gsea_table_list <- list()
-gsea_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/gsea/"
-# GOI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/volcano_GOI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
-# POI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/dge_POI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
-GOI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/volcano_GOI_table_v3.csv", sep = ",", header = TRUE, check.names = FALSE)
-POI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/dge_POI_table_v2.csv", sep = ",", header = TRUE, check.names = FALSE, na.strings = c("", NA, "NA", " "))
+gsea_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/gsea/"
+# GOI_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/volcano_GOI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
+# POI_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/dge_POI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
+GOI_table <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/volcano_GOI_table_v3.csv", sep = ",", header = TRUE, check.names = FALSE)
+POI_table <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/dge_POI_table_v2.csv", sep = ",", header = TRUE, check.names = FALSE, na.strings = c("", NA, "NA", " "))
 
 
 for (dge_comp in dge_comp_list) {
@@ -549,11 +561,11 @@ dir.create(paste0(outfilepathmaster, "clean_dmp_figures/dmp_pseaplots/"), showWa
 # Read in DESeq and PSEA results
 dmp_comp_list <- c("DMP_ischemia__Sev_v_MildNone", "DMP_anatomy70__3v_v_1v")
 dmp_table_list <- list()
-dmp_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/"
+dmp_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/"
 psea_table_list <- list()
-psea_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/PSEA/run2/c5/"
-GOI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/volcano_GOI_table_v3.csv", sep = ",", header = TRUE, check.names = FALSE)
-POI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/dge_POI_table_v2.csv", sep = ",", header = TRUE, check.names = FALSE, na.strings = c("", NA, "NA", " "))
+psea_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/PSEA/run2/c5/"
+GOI_table <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/volcano_GOI_table_v3.csv", sep = ",", header = TRUE, check.names = FALSE)
+POI_table <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/dge_POI_table_v2.csv", sep = ",", header = TRUE, check.names = FALSE, na.strings = c("", NA, "NA", " "))
 
 
 for (dmp_comp in dmp_comp_list) {
@@ -765,10 +777,10 @@ for (analysis_comp_num in seq_along(diffexp_list)) {
 
 # Furthering this process by then also comparing to our RNA vs Meth comparison we are doing - just tryna find the perfect pathways to focus on.............
 dir.create(paste0(outfilepathmaster, "IMGDEGIS_v_CTNDV70/", "overlap_pathway_lists/"), showWarnings = FALSE, recursive = TRUE)
-IMGDEGIS_v_CTNDV70_gsea_comptable <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run8/IMGDEGIS_v_CTNDV70/gsea_comp/gsea_comp_feature_plottable.csv", sep = ",", header = TRUE, row.names = 1)
-IMGDEGIS_v_CTNDV70_psea_comptable <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run8/IMGDEGIS_v_CTNDV70/psea_comp/psea_comp_feature_plottable.csv", sep = ",", header = TRUE, row.names = 1)
-RNA_v_Meth_IMGDEGIS_comptable <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run8/RNA_v_Meth/comp_ischemia__Sev_v_MildNone/gsa_comp/comp_ischemia__Sev_v_MildNone_gsacomp_plottable.csv", sep = ",", header = TRUE, row.names = 1)
-RNA_v_Meth_CTNDV70_comptable <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run8/RNA_v_Meth/comp_anatomy70__3v_v_1v/gsa_comp/comp_anatomy70__3v_v_1v_gsacomp_plottable.csv", sep = ",", header = TRUE, row.names = 1)
+IMGDEGIS_v_CTNDV70_gsea_comptable <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run8/IMGDEGIS_v_CTNDV70/gsea_comp/gsea_comp_feature_plottable.csv", sep = ",", header = TRUE, row.names = 1)
+IMGDEGIS_v_CTNDV70_psea_comptable <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run8/IMGDEGIS_v_CTNDV70/psea_comp/psea_comp_feature_plottable.csv", sep = ",", header = TRUE, row.names = 1)
+RNA_v_Meth_IMGDEGIS_comptable <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run8/RNA_v_Meth/comp_ischemia__Sev_v_MildNone/gsa_comp/comp_ischemia__Sev_v_MildNone_gsacomp_plottable.csv", sep = ",", header = TRUE, row.names = 1)
+RNA_v_Meth_CTNDV70_comptable <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run8/RNA_v_Meth/comp_anatomy70__3v_v_1v/gsa_comp/comp_anatomy70__3v_v_1v_gsacomp_plottable.csv", sep = ",", header = TRUE, row.names = 1)
 
 ## overlap inlists
 RNA_Meth_IMGDEGIS_CTNDV70_overlapinlists <- list(
@@ -808,8 +820,8 @@ for (inlist in RNA_Meth_IMGDEGIS_CTNDV70_overlapinlists) {
 }
 
 # dir.create(paste0(compplot_outfilepath, "protect_v_risk/"), showWarnings = FALSE, recursive = TRUE)
-# protect_genes <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS1_v_meth_MS2/UL_genes.csv", sep = ",")[,1]
-# risk_genes <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS2_v_meth_MS3/UL_genes.csv", sep = ",")[,1]
+# protect_genes <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS1_v_meth_MS2/UL_genes.csv", sep = ",")[,1]
+# risk_genes <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS2_v_meth_MS3/UL_genes.csv", sep = ",")[,1]
 
 # overlapinlist <- list(
 #     protect_genes = protect_genes,
@@ -840,9 +852,9 @@ dir.create(paste0(outfilepathmaster, "RNA_v_Meth/"), showWarnings = FALSE, recur
 
 # Full pathway table
 go_rna_genesettab = as.data.frame(msigdbr(species = "Homo sapiens", category = c("C5"))[,c("gs_name", "gene_symbol")])
-go_meth_genesttab <- readRDS("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/probe_set_C5_reftable.rds")
+go_meth_genesttab <- readRDS("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/PSEA_reference_tables/probe_set_C5_reftable.rds")
 ## Need this table for reference
-DMP_table_in <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/",
+DMP_table_in <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/",
                                   "DMP_ischemia__Sev_v_MildNone/DMP_analysis_and_figs/DMP_ischemia__Sev_v_MildNone_DMP_table.csv"), sep = ",", row.names = 1, header = TRUE)
 methgenegrab <- unique(DMP_table_in[,"gene"])
 rnagenes_w_probes_geneset_counttab <- aggregate(go_rna_genesettab[,"gene_symbol",drop=FALSE], 
@@ -851,8 +863,8 @@ rnagenes_w_probes_geneset_counttab <- aggregate(go_rna_genesettab[,"gene_symbol"
 colnames(rnagenes_w_probes_geneset_counttab) <- c("gs_name", "genes_with_probe_count")
 
 ## Set analyses for comparison
-Meth_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/"
-RNAseq_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/"
+Meth_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/"
+RNAseq_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/"
 analysis_comp_list <- list(
     run1 = list(analysis_label = "comp_ischemia__Sev_v_MildNone",
                 DMP_table_path = paste0(Meth_path, "DMP_ischemia__Sev_v_MildNone/DMP_analysis_and_figs/DMP_ischemia__Sev_v_MildNone_DMP_table.csv"),
@@ -1155,7 +1167,7 @@ meth_anatomy70__3v_v_1v_MLfeatures <- meth_anatomy70__3v_v_1v_MLfeature_table[me
 
 # I think I need a custom ML metatable - only cause i need it for the meth data really...
 # RNA metatable
-metatable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/rna_processing/metatable_in.csv"
+metatable_file <- file.path(DATA_DIR, "metatable_in.csv")
 metatable <- read.table(metatable_file, sep = ",", header = TRUE, row.names = 1)
 rna_ML_metatable <- cbind(Sample_Patnum = rownames(metatable), metatable[,c("comp_ischemia__Sev_v_MildNone", "comp_anatomy70__3v_v_1v")])
 rna_ML_metatable[,c("comp_ischemia__Sev_v_MildNone")] <- ifelse(rna_ML_metatable[,c("comp_ischemia__Sev_v_MildNone")] == 1, "Severe",
@@ -1164,10 +1176,10 @@ rna_ML_metatable[,c("comp_anatomy70__3v_v_1v")] <- ifelse(rna_ML_metatable[,c("c
                                                    ifelse(rna_ML_metatable[,c("comp_anatomy70__3v_v_1v")] == 0, "1v", NA))
 colnames(rna_ML_metatable) <- c("PATNUM", "rna_comp_ischemia__Sev_v_MildNone", "rna_comp_anatomy70__3v_v_1v")
 # Meth metatable
-meth_imgdegis_metatable_temp <- readRDS("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/DMP_with_asr_correction/metadata_DMP_on_IMGDEGIS_control.rds")[,c("Sample_Patnum", "IMGDEGIS")]
+meth_imgdegis_metatable_temp <- readRDS("# PATH_UPDATED: data/final_meth_data_v1_20230207/DMP_with_asr_correction/metadata_DMP_on_IMGDEGIS_control.rds")[,c("Sample_Patnum", "IMGDEGIS")]
 meth_imgdegis_metatable_temp[,"meth_comp_ischemia__Sev_v_MildNone"] <- ifelse(meth_imgdegis_metatable_temp[,"IMGDEGIS"] == "Severe", "Severe", 
                                                                               ifelse(meth_imgdegis_metatable_temp[,"IMGDEGIS"] == "No_mild", "No_mild", NA))
-meth_ctndv70_metatable_temp <- readRDS("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/DMP_with_asr_correction/metadata_DMP_on_CTNDV70_control.rds")[,c("Sample_Patnum", "CTNDV70")]
+meth_ctndv70_metatable_temp <- readRDS("# PATH_UPDATED: data/final_meth_data_v1_20230207/DMP_with_asr_correction/metadata_DMP_on_CTNDV70_control.rds")[,c("Sample_Patnum", "CTNDV70")]
 meth_ctndv70_metatable_temp[,"meth_comp_anatomy70__3v_v_1v"] <- ifelse(meth_ctndv70_metatable_temp[,"CTNDV70"] == "3", "3v",
                                                                        ifelse(meth_ctndv70_metatable_temp[,"CTNDV70"] == "1", "1v", NA))
 meth_ML_metatable <- merge(meth_imgdegis_metatable_temp[,c("Sample_Patnum", "meth_comp_ischemia__Sev_v_MildNone")],
@@ -1412,22 +1424,22 @@ for (MLrun in MLrun_sel) {
 
 
 # --------------------------------- DANGER-LONG-RUN-TIME cluster_eigen_meta_summary_heatmap --------------------------------- 
-methcounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/limma_noCovariate.rds"
+methcounttable_file <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/limma_noCovariate.rds"
 methcounttable <- readRDS(methcounttable_file)
 colnames(methcounttable) <- methmetatable[match(methmetatable[,"Sample_Name"], colnames(methcounttable)), "Sample_Patnum"]
 methcounttable <- methcounttable[,-578] # Need to remove the duplicate of this sample: "048003-005", columns 204 and 578
 
-meth_eigengenecounttable <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_eigengene_nogrey_table.csv"),sep = ",", header = TRUE, row.names = 1)
-meth_wgcna_genestocolors <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_wgcna_genestocolors.csv"), sep = ",", header = TRUE, row.names = 1)
+meth_eigengenecounttable <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_eigengene_nogrey_table.csv"),sep = ",", header = TRUE, row.names = 1)
+meth_wgcna_genestocolors <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_wgcna_genestocolors.csv"), sep = ",", header = TRUE, row.names = 1)
 
 
 # I manually curated and created module annotation tables
-rna_wgcna_chosen_annotation_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/WGCNA/rna_wgcna_notation_table.csv",
+rna_wgcna_chosen_annotation_table <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/WGCNA/rna_wgcna_notation_table.csv",
                                                 sep = ",", header = TRUE)
-rna_wgcna_full_C5_annotation_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/WGCNA/WGCNA_power14_size30/C5_wgcna_module_annotations.csv",
+rna_wgcna_full_C5_annotation_table <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/WGCNA/WGCNA_power14_size30/C5_wgcna_module_annotations.csv",
                                                  sep = ",", header = TRUE, row.names = 1)
 
-meth_wgcna_chosen_annotation_table_temp <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/meth_WGCNA_custom_selected_pathways_v1.csv", sep = ",", header = TRUE)
+meth_wgcna_chosen_annotation_table_temp <- read.table("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/manual_annotation_tables/meth_WGCNA_custom_selected_pathways_v1.csv", sep = ",", header = TRUE)
 meth_wgcna_chosen_annotation_table <- data.frame(cbind(eigengene = meth_wgcna_chosen_annotation_table_temp[,"module"], goterm = meth_wgcna_chosen_annotation_table_temp[,"ID"]))
 meth_wgcna_full_C5_annotation_table <- read.table(paste0(outfilepathmaster, "meth_WGCNA/", "GO_meth_wgcna_module_annotations.csv"), sep = ",", header = TRUE, row.names = 1)
 
@@ -1478,7 +1490,7 @@ for (group_column_selected in group_columns_for_testing) {
         # Addinig in this analysis here - what KIND of probes are in each of our modules?
         dir.create(paste0(outfilepathmaster, "nmf_wgcna_integration/", group_column_selected, "/", "probe_feature_label_plots/"), showWarnings = FALSE, recursive = TRUE)
         ## Need this table for reference
-        DMP_table_in <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/",
+        DMP_table_in <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/meth_processing/run3/asr_corrected_DMP/",
                                           "DMP_ischemia__Sev_v_MildNone/DMP_analysis_and_figs/DMP_ischemia__Sev_v_MildNone_DMP_table.csv"), sep = ",", row.names = 1, header = TRUE)
         probe_feature_labels <- c("feature", "cgi", "feat.cgi", "CHR")
         module_probetype_table <- cbind(ingenestocolortable[,"moduleColors",drop=FALSE], DMP_table_in[rownames(ingenestocolortable), probe_feature_labels])
@@ -1885,7 +1897,7 @@ dir.create(paste0(outfilepathmaster, "subtype_deseq_figures/"), showWarnings = F
 subtype_list <- c("RNAtype1_vs_NOTRNAtype1", "RNAtype2_vs_NOTRNAtype2", "RNAtype3_vs_NOTRNAtype3", "RNAtype4_vs_NOTRNAtype4",
                   "RNAtype2_vs_RNAtype1", "RNAtype3A_vs_NOTRNAtype3A", "RNAtype3B_vs_NOTRNAtype3B", "RNAtype3B_vs_RNAtype3A")
 deseq_table_list <- list()
-deseq_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/deseq/"
+deseq_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/deseq/"
 for (subtype in subtype_list) {
     intable <- read.table(paste0(deseq_path, "comp_RNAsubtype_", subtype, "/deseq_results_comp_RNAsubtype_", subtype, ".csv"), 
                           sep = ",", header = TRUE, row.names = 1)
@@ -1893,7 +1905,7 @@ for (subtype in subtype_list) {
 }
 
 gsea_table_list <- list()
-gsea_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/gsea/"
+gsea_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/gsea/"
 for (subtype in subtype_list) {
     intable <- read.table(paste0(gsea_path, "comp_RNAsubtype_", subtype, "/comp_RNAsubtype_", subtype, "_gsea_GO.csv"), 
                           sep = ",", header = TRUE, row.names = 1)
@@ -1930,7 +1942,7 @@ for (subtype in c("RNAtype1_vs_NOTRNAtype1", "RNAtype2_vs_NOTRNAtype2", "RNAtype
     name_select <- strsplit(subtype, split = "_")[[1]][1]
     if (subtype == "RNAtype3B_vs_RNAtype3A") {name_select <- "RNAtype3Bv3A"}
     
-    GOI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run4/subtype_deseq_figures/subtype_GOI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
+    GOI_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run4/subtype_deseq_figures/subtype_GOI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
     GOI <- GOI_table[,subtype]
     if (sum(!is.na(GOI)) == 0) {GOI <- NULL}
     
@@ -1951,7 +1963,7 @@ for (subtype in c("RNAtype1_vs_NOTRNAtype1", "RNAtype2_vs_NOTRNAtype2", "RNAtype
     name_select <- strsplit(subtype, split = "_")[[1]][1]
     if (subtype == "RNAtype3B_vs_RNAtype3A") {name_select <- "RNAtype3Bv3A"}
     
-    POI_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run4/subtype_deseq_figures/subtype_POI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
+    POI_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run4/subtype_deseq_figures/subtype_POI_table.csv", sep = ",", header = TRUE, check.names = FALSE)
     POI <- POI_table[,subtype]
     
     gsea_out <- clean_gsea_plot_function(gseatable=table_select, nameparam=subtype, pathwayselect = POI)
@@ -1968,16 +1980,16 @@ for (subtype in c("RNAtype1_vs_NOTRNAtype1", "RNAtype2_vs_NOTRNAtype2", "RNAtype
 
 # --------------------------------- cohort signature scores ---------------------------------
 # Read in meth count table and metatable
-methmetatable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/kpp_metadata.rds"
+methmetatable_file <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/kpp_metadata.rds"
 methmetatable <- readRDS(methmetatable_file)
-methcounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/limma_noCovariate.rds"
+methcounttable_file <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/limma_noCovariate.rds"
 methcounttable <- readRDS(methcounttable_file)
 colnames(methcounttable) <- methmetatable[match(methmetatable[,"Sample_Name"], colnames(methcounttable)), "Sample_Patnum"]
 methcounttable <- methcounttable[,-578] # Need to remove the duplicate of this sample: "048003-005", columns 204 and 578
 methmetatable <- methmetatable[-578,] # Need to remove the duplicate of this sample: "048003-005", columns 204 and 578
 
 # Need to grab this metatable unfortunately
-metatable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3b_rmoutliers2_addoncomps/rna_processing/metatable_in.csv"
+metatable_file <- file.path(DATA_DIR, "metatable_in.csv")
 metatable_forsigscore <- read.table(metatable_file, sep = ",", header = TRUE, row.names = 1)
 ## Need to add on our meth comparisons
 meth_metatable_forsigscore <- bioreptable_waddons[SOImeth, c("DEGRISCH", "CTNDV70", "meth_3cluster")]
@@ -1998,10 +2010,10 @@ metatable_forsigscore <- metatable_forsigscore[,!grepl("Row.names", colnames(met
 dir.create(paste0(outfilepathmaster, "signature_scoring/"), showWarnings = FALSE, recursive = TRUE)
 
 # Set paths for where the DGE files are
-deseq_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/deseq/"
-# DMP_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220426/methylation_output_Tosh/"
-# DMP_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/DMP/"
-DMP_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/final_meth_data_v1_20230207/DMP_with_asr_correction/"
+deseq_path <- "# PATH_UPDATED: output/run4_rmoutliers2_asr_control/deseq/"
+# DMP_path <- "# PATH_UPDATED: data/methylation_data_20220426/methylation_output_Tosh/"
+# DMP_path <- "# PATH_UPDATED: data/methylation_data_20220608/DMP/"
+DMP_path <- "# PATH_UPDATED: data/final_meth_data_v1_20230207/DMP_with_asr_correction/"
 # Create list of dges to score
 rna_dge_cutoffs <- c(pval_test = "padj", pval_cutoff = 0.05, log2fc_cutoff = 0.25)
 meth_dmp_cutoffs <- c(pval_test = "adj.P.Val", pval_cutoff = 0.05, log2fc_cutoff = 0.03)
@@ -2032,7 +2044,7 @@ dge_comp_list <- list(
 
 # Ok I just need to clean this object, cause theres a couple things that need to be adjusted
 # meth_subtype_DMP_object <- readRDS(paste0(DMP_path, "DMP_k3_limma_noCov_oneVSother.rds"))
-# OLDTEMP <- readRDS(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/DMP/", "DMP_k3_limma_noCov_oneVSother.rds"))
+# OLDTEMP <- readRDS(paste0("# PATH_UPDATED: data/methylation_data_20220608/DMP/", "DMP_k3_limma_noCov_oneVSother.rds"))
 meth_subtype_DMP_object <- readRDS(paste0(DMP_path, "limma_BCcorrected_DMP_on_kpp_oneVSother_control.rds"))
 # cleaned_meth_subtype_DMP_object <- clean_meth_subtype_DMP_object_function(meth_subtype_DMP_object)
 
@@ -2118,7 +2130,7 @@ singscore_list <- c("rna_subtype1", "rna_subtype2", "rna_subtype3", "rna_subtype
                     # "meth_subtype1", "meth_subtype2", "meth_subtype3"
                     )
 singscore_table_list <- list()
-singscore_path <- paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run7/",
+singscore_path <- paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run7/",
                          "signature_scoring/")
 scoring_genesetsize = c("all", 1000, 500, 100, 50)
 singscore_grid <- expand.grid(singscore_list, scoring_genesetsize)
@@ -2650,13 +2662,13 @@ for (EOI_sel in colnames(EOI_table)) {
 dir.create(paste0(outfilepathmaster, "subtype-combo/", "eigen_heatmaps/"), showWarnings = FALSE, recursive = TRUE)
 
 # RNA - WGCNA
-eigengenecounttable_file <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv"
+eigengenecounttable_file <- "# PATH_UPDATED: output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv"
 eigengenecounttable <- read.table(eigengenecounttable_file, sep = ",", header = TRUE, row.names = 1)
 rna_eigengeneOI <- paste0("ME", c("magenta", "salmon", "purple", "midnightblue", "turquoise", 
                                   "yellow", "pink", "red", 
                                   "blue", "tan", "brown",
                                   "greenyellow", "black", "cyan", "green"))
-meth_eigengenecounttable <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_eigengene_nogrey_table.csv"),sep = ",", header = TRUE, row.names = 1)
+meth_eigengenecounttable <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_eigengene_nogrey_table.csv"),sep = ",", header = TRUE, row.names = 1)
 meth_eigengeneOI <- paste0("ME", c("yellow", "cyan", "tan", "turquoise", "black", 
                                    "magenta", "pink", "brown",
                                    "blue", "red", "salmon", "green", "purple"))
@@ -2941,19 +2953,19 @@ for (combo_eigen_plotparam in combo_eigen_plot_inlist) {
 dir.create(paste0(outfilepathmaster, "subtype-combo/", "diff_comp_plots/"), showWarnings = FALSE, recursive = TRUE)
 
 # Read in the deseq tables that we need
-deseq_rna_CTNDV70_3v_v_1v_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3b_rmoutliers2_addoncomps/deseq/comp_anatomy70__3v_v_1v/deseq_results_comp_anatomy70__3v_v_1v.csv", sep = ",", header = TRUE, row.names = 1)
-deseq_rna_IMGDEGIS_Sev_v_MildNone_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3b_rmoutliers2_addoncomps/deseq/comp_ischemia__Sev_v_MildNone/deseq_results_comp_ischemia__Sev_v_MildNone.csv", sep = ",", header = TRUE, row.names = 1)
-deseq_rna_RS1_v_notRS1_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype1_vs_NOTRNAtype1/deseq_results_comp_RNAsubtype_RNAtype1_vs_NOTRNAtype1.csv", sep = ",", header = TRUE, row.names = 1)
-deseq_rna_RS2_v_notRS2_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype2_vs_NOTRNAtype2/deseq_results_comp_RNAsubtype_RNAtype2_vs_NOTRNAtype2.csv", sep = ",", header = TRUE, row.names = 1)
-deseq_rna_RS3_v_notRS3_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype3_vs_NOTRNAtype3/deseq_results_comp_RNAsubtype_RNAtype3_vs_NOTRNAtype3.csv", sep = ",", header = TRUE, row.names = 1)
-deseq_rna_RS4_v_notRS4_table <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype4_vs_NOTRNAtype4/deseq_results_comp_RNAsubtype_RNAtype4_vs_NOTRNAtype4.csv", sep = ",", header = TRUE, row.names = 1)
+deseq_rna_CTNDV70_3v_v_1v_table <- read.table("# PATH_UPDATED: output/run3b_rmoutliers2_addoncomps/deseq/comp_anatomy70__3v_v_1v/deseq_results_comp_anatomy70__3v_v_1v.csv", sep = ",", header = TRUE, row.names = 1)
+deseq_rna_IMGDEGIS_Sev_v_MildNone_table <- read.table("# PATH_UPDATED: output/run3b_rmoutliers2_addoncomps/deseq/comp_ischemia__Sev_v_MildNone/deseq_results_comp_ischemia__Sev_v_MildNone.csv", sep = ",", header = TRUE, row.names = 1)
+deseq_rna_RS1_v_notRS1_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype1_vs_NOTRNAtype1/deseq_results_comp_RNAsubtype_RNAtype1_vs_NOTRNAtype1.csv", sep = ",", header = TRUE, row.names = 1)
+deseq_rna_RS2_v_notRS2_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype2_vs_NOTRNAtype2/deseq_results_comp_RNAsubtype_RNAtype2_vs_NOTRNAtype2.csv", sep = ",", header = TRUE, row.names = 1)
+deseq_rna_RS3_v_notRS3_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype3_vs_NOTRNAtype3/deseq_results_comp_RNAsubtype_RNAtype3_vs_NOTRNAtype3.csv", sep = ",", header = TRUE, row.names = 1)
+deseq_rna_RS4_v_notRS4_table <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/deseq/comp_RNAsubtype_RNAtype4_vs_NOTRNAtype4/deseq_results_comp_RNAsubtype_RNAtype4_vs_NOTRNAtype4.csv", sep = ",", header = TRUE, row.names = 1)
 
 
-DMP_meth_CTNDV70_3v_v_1v_table <- readRDS("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/DMP/DMP_on_CTNDV70_3vs1.rds")
-DMP_meth_degrisch_sev_nomild_table <- readRDS("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/DMP/DMP_on_degrisch_sev_nomild.rds")
+DMP_meth_CTNDV70_3v_v_1v_table <- readRDS("# PATH_UPDATED: data/methylation_data_20220608/DMP/DMP_on_CTNDV70_3vs1.rds")
+DMP_meth_degrisch_sev_nomild_table <- readRDS("# PATH_UPDATED: data/methylation_data_20220608/DMP/DMP_on_degrisch_sev_nomild.rds")
 colnames(DMP_meth_CTNDV70_3v_v_1v_table)[colnames(DMP_meth_CTNDV70_3v_v_1v_table) == "logFC"] <- "signed_deltaBeta"
 colnames(DMP_meth_degrisch_sev_nomild_table)[colnames(DMP_meth_degrisch_sev_nomild_table) == "logFC"] <- "signed_deltaBeta"
-meth_subtype_DMP_object <- readRDS(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/data/methylation_data_20220608/DMP/DMP_k3_limma_noCov_oneVSother.rds"))
+meth_subtype_DMP_object <- readRDS(paste0("# PATH_UPDATED: data/methylation_data_20220608/DMP/DMP_k3_limma_noCov_oneVSother.rds"))
 cleaned_meth_subtype_DMP_object <- clean_meth_subtype_DMP_object_function(meth_subtype_DMP_object)
 DMP_meth_MS1_v_notMS1_table <- cleaned_meth_subtype_DMP_object[["not_to_1"]]    
 DMP_meth_MS2_v_notMS2_table <- cleaned_meth_subtype_DMP_object[["2_to_not"]]    
@@ -3018,8 +3030,8 @@ for (multiomic_comp_num in seq_along(multiomic_comp_list)) {
 
 # How is this possible - the genes are pathways are the same that are up in our protective and vulnerable groups... wtf
 dir.create(paste0(compplot_outfilepath, "protect_v_risk/"), showWarnings = FALSE, recursive = TRUE)
-protect_genes <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS1_v_meth_MS2/UL_genes.csv", sep = ",")[,1]
-risk_genes <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS2_v_meth_MS3/UL_genes.csv", sep = ",")[,1]
+protect_genes <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS1_v_meth_MS2/UL_genes.csv", sep = ",")[,1]
+risk_genes <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS2_v_meth_MS3/UL_genes.csv", sep = ",")[,1]
 
 overlapinlist <- list(
     protect_genes = protect_genes,
@@ -3046,8 +3058,8 @@ junk <- dev.off()
 
 # What about pathways
 dir.create(paste0(outfilepathmaster, "subtype-combo/", "protect_v_risk/", "gsea_comp/"), showWarnings = FALSE, recursive = TRUE)
-protect_gsea <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS1_v_meth_MS2/UL_hypergeo.csv", sep = ",", header = TRUE, row.names = 1)
-risk_gsea <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS2_v_meth_MS3/UL_hypergeo.csv", sep = ",", header = TRUE, row.names = 1)
+protect_gsea <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS1_v_meth_MS2/UL_hypergeo.csv", sep = ",", header = TRUE, row.names = 1)
+risk_gsea <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/integrative_analyses/run6/subtype-combo/diff_comp_plots/rna_RS2_v_meth_MS3/UL_hypergeo.csv", sep = ",", header = TRUE, row.names = 1)
 
 gsea_comp_table <- merge(protect_gsea[,"p.adjust",drop=FALSE], risk_gsea[,"p.adjust",drop=FALSE],
                          by = "row.names", suffixes = c("_protect", "_risk"), all = TRUE)
@@ -3115,7 +3127,7 @@ write.table(out1_ratiotable, paste0(COI_tabulation_subpath, "signed_filtered_sig
 write.table(out1_citable, paste0(COI_tabulation_subpath, "signed_filtered_sigfeature_ci_table.csv"), col.names = NA, row.names = TRUE, sep = ",")
 
 
-gene_probe_corrtable <- readRDS("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/ze_analysis/rna_meth_cor/r_value_output/integrative_correlation_all_group_1_50000.rds")
+gene_probe_corrtable <- readRDS("# PATH_UPDATED: ze_analysis/rna_meth_cor/r_value_output/integrative_correlation_all_group_1_50000.rds")
 
 
 
@@ -3356,14 +3368,14 @@ dir.create(paste0(outfilepathmaster, "eigengene_vs_event/"), showWarnings = FALS
 bioreptable_waddons <- read.table(paste0(outfilepathmaster, "bioreptable_waddons.csv"), sep = ",", header = TRUE, row.names = 1)
 
 ## We want RNA and methylation Eigengenes, can test all at once and just adjust population as necessary
-meth_eigengenecounttable <- read.table(paste0("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_eigengene_nogrey_table.csv"), sep = ",", header = TRUE, row.names = 1)
+meth_eigengenecounttable <- read.table(paste0("# PATH_UPDATED: output/run4_rmoutliers2_asr_control/integrative_analyses/run7/", "meth_WGCNA/", "meth_eigengene_nogrey_table.csv"), sep = ",", header = TRUE, row.names = 1)
 meth_eigenGOI <- paste0("ME", c("tan", "cyan", "darkgreen", "yellow", "turquoise", "black",
   "brown", "pink", "magenta", "darkturquoise",
   "purple", "salmon", "blue", "green", "red"))
 meth_eigengenecounttable <- meth_eigengenecounttable[,meth_eigenGOI]
 
 
-eigengenecounttable <- read.table("/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv", sep = ",", header = TRUE, row.names = 1)
+eigengenecounttable <- read.table("# PATH_UPDATED: output/run3_rmoutliers2/WGCNA/WGCNA_power14_size30/wgcna_eigengenes.csv", sep = ",", header = TRUE, row.names = 1)
 
 
 combo_eigengenecounttable <- merge(eigengenecounttable, meth_eigengenecounttable, all = TRUE, by = "row.names")
@@ -3542,7 +3554,7 @@ write.table(km_outstat_table, paste0(outfilepathmaster, "eigengene_vs_event/", "
 # dir.create(paste0(outfilepathmaster, "cluster_performance_modeling_downsample/"), showWarnings = FALSE, recursive = TRUE)
 dge_comp_list <- c("comp_ischemia__Sev_v_MildNone", "comp_anatomy__3v_v_1v")
 deseq_table_list <- list()
-deseq_path <- "/Users/tosh/Desktop/Ruggles_Lab/projects/ischemia2021/output/run3_rmoutliers2/deseq/"
+deseq_path <- "# PATH_UPDATED: output/run3_rmoutliers2/deseq/"
 for (dge_comp in dge_comp_list) {
     intable_deseq <- read.table(paste0(deseq_path, dge_comp, "/deseq_results_", dge_comp, ".csv"), 
                                 sep = ",", header = TRUE, row.names = 1)
