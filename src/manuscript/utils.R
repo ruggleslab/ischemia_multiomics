@@ -184,5 +184,174 @@ perform_pathway_analysis <- function(gene_list, background_genes = NULL) {
     ))
 }
 
+# Function to process tabulation table with standardized recoding
+#' Process Tabulation Table
+#'
+#' Standardizes the tabulation table by recoding variables consistently
+#' across all analysis scripts
+#'
+#' @param data Raw tabulation table
+#' @return Processed tabulation table with standardized variables
+process_tabulation_table <- function(data) {
+    data %>%
+        # Recode censoring variables (2 -> 0 for consistency)
+        mutate_at(vars(starts_with("C_")), ~ ifelse(.x == 2, 0, .x)) %>%
+        # Standardize demographic variables
+        mutate(
+            # Recode missing ethnicity
+            ETHNIC = case_when(
+                ETHNIC == "99" ~ NA_character_,
+                TRUE ~ ETHNIC
+            ),
+            # Standardize race categories
+            RACE = case_when(
+                RACE == "White" ~ "White",
+                RACE == "Black or African American" ~ "Black",
+                RACE == "Asian" ~ "Asian",
+                RACE %in% c("American Indian or Alaska Native",
+                           "Native Hawaiian or Other Pacific Islander",
+                           "Multiple Races") ~ "Other",
+                TRUE ~ NA_character_
+            ),
+            # Create dialysis indicator
+            NO_DIALYSIS = case_when(
+                DIALYSIS == "Yes" ~ 0,
+                DIALYSIS == "No" ~ 1,
+                TRUE ~ NA_real_
+            ),
+            # Create composite subtypes if RNA and methylation clusters exist
+            composite_subtype = if ("rna_4cluster" %in% colnames(.) &
+                                   "meth_3cluster" %in% colnames(.)) {
+                interaction(
+                    gsub("nmf_cluster_", "RS", rna_4cluster),
+                    gsub("meth_3cluster_", "MS", meth_3cluster),
+                    drop = TRUE, sep = "_"
+                )
+            } else {
+                NA_character_
+            },
+            # Create composites of interest
+            composites_of_interest = if (!is.na(composite_subtype[1])) {
+                factor(
+                    composite_subtype,
+                    levels = c("RS2_MS3", "RS4_MS3"),
+                    labels = c("CS1", "CS2")
+                )
+            } else {
+                NA_character_
+            },
+            # Create one-vs-rest comparisons
+            cs1_v_rest = case_when(
+                composites_of_interest == "CS1" ~ "CS1",
+                TRUE ~ "Rest"
+            ),
+            cs2_v_rest = case_when(
+                composites_of_interest == "CS2" ~ "CS2",
+                TRUE ~ "Rest"
+            )
+        )
+}
+
+# Function to safely load data files with error checking
+#' Load Data File Safely
+#'
+#' Loads a data file with existence and format checking
+#'
+#' @param file_path Path to the data file
+#' @param file_type Type of file ("csv", "tsv", "txt")
+#' @param required_columns Optional vector of required column names
+#' @return Data frame or matrix
+load_data_safe <- function(file_path, file_type = "csv", required_columns = NULL) {
+    # Check file exists
+    if (!file.exists(file_path)) {
+        stop("Data file not found: ", file_path,
+             "\nPlease check the file path in config.R or your data directory")
+    }
+
+    # Load based on file type
+    data <- switch(file_type,
+        "csv" = read.csv(file_path, row.names = 1, stringsAsFactors = FALSE),
+        "tsv" = read.table(file_path, sep = "\t", header = TRUE, row.names = 1,
+                          stringsAsFactors = FALSE),
+        "txt" = read.table(file_path, sep = "\t", header = TRUE, row.names = 1,
+                          stringsAsFactors = FALSE),
+        stop("Unsupported file type: ", file_type)
+    )
+
+    # Check for required columns
+    if (!is.null(required_columns)) {
+        missing_cols <- setdiff(required_columns, colnames(data))
+        if (length(missing_cols) > 0) {
+            stop("Missing required columns in ", basename(file_path), ": ",
+                 paste(missing_cols, collapse = ", "))
+        }
+    }
+
+    log_analysis_step(paste("Loaded data from", basename(file_path),
+                           "- Dimensions:", nrow(data), "x", ncol(data)))
+
+    return(data)
+}
+
+# Function to calculate odds ratios for one-vs-rest comparisons
+#' Calculate One-vs-Rest Odds Ratios
+#'
+#' Performs logistic regression to calculate odds ratios for each level
+#' of a grouping variable compared to all other levels
+#'
+#' @param data Data frame containing the variables
+#' @param group_var Character string naming the grouping variable
+#' @param test_vars Character vector of test variable names
+#' @param control_vars Character vector of control variable names (default: demographics)
+#' @return Data frame with odds ratios, confidence intervals, and p-values
+calculate_odds_ratios_one_vs_rest <- function(data, group_var, test_vars,
+                                             control_vars = c("AGE_RAND", "SEX", "RACE", "ETHNIC")) {
+    # Drop missing data
+    d <- drop_na(data, all_of(c(group_var, test_vars, control_vars)))
+
+    # One versus rest approach for each level of the group variable
+    unique_levels <- unique(d[[group_var]])
+
+    one_vs_rest_results <- map(unique_levels, ~ {
+        level <- .x
+        # Create binary variable for current level vs rest
+        d_ovr <- d %>%
+            mutate(!!glue("{group_var}_ovr") := ifelse(!!sym(group_var) == level, 1, 0))
+
+        ovr_results <- map(test_vars, ~ {
+            test_var <- .x
+            # Create a logistic regression model for each test variable
+            controls_formula <- paste(control_vars, collapse = " + ")
+            fmla <- as.formula(glue("{group_var}_ovr ~ {test_var} + {controls_formula}"))
+
+            tryCatch({
+                model <- glm(fmla, data = d_ovr, family = binomial)
+                model_tidy <- tidy(model)
+                model_tidy <- model_tidy %>%
+                    filter(term == test_var) %>%
+                    mutate(
+                        variable = test_var,
+                        odds_ratio = exp(estimate),
+                        lower_ci = exp(estimate - 1.96 * std.error),
+                        upper_ci = exp(estimate + 1.96 * std.error),
+                        level = level
+                    ) %>%
+                    select(variable, level, odds_ratio, lower_ci, upper_ci, p.value)
+                return(model_tidy)
+            }, error = function(e) {
+                warning(glue("Model failed for {test_var} in {group_var} = {level}: {e$message}"))
+                return(NULL)
+            })
+        })
+        ovr_results <- bind_rows(ovr_results)
+        return(ovr_results)
+    })
+
+    one_vs_rest_results <- bind_rows(one_vs_rest_results)
+    one_vs_rest_results$group <- group_var
+
+    return(one_vs_rest_results)
+}
+
 # Set default ggplot theme
 theme_set(get_publication_theme())

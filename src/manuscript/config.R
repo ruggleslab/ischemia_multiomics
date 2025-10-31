@@ -33,12 +33,22 @@ dir.create(TABLES_DIR, recursive = TRUE, showWarnings = FALSE)
 
 # ======================== ANALYSIS PARAMETERS ========================
 # Random seed for reproducibility
+# Use this seed in all scripts to ensure consistent results
 RANDOM_SEED <- 42
+
+# QC parameters for expression data
+MIN_READ_COUNT <- 2000000  # Minimum reads per sample
+MIN_GENE_COUNT <- 16       # Minimum counts for gene inclusion
+MIN_SAMPLES_FRACTION <- 0.5 # Fraction of samples gene must be expressed in
 
 # Analysis parameters
 WGCNA_POWER <- 16
 WGCNA_MIN_MODULE_SIZE <- 40
 NMF_RANK <- 4
+
+# Variance gene selection percentiles (for PCA and heatmaps)
+UPPER_PERCENTILE <- 0.9999
+LOWER_PERCENTILE <- 0.95
 
 # ======================== FILE PATHS ========================
 # These paths should be updated to point to your actual data files
