@@ -6,10 +6,10 @@ This repository contains a predictive model and associated gene sets for classif
 
 - Prediction model
 - Gene sets:
-    - RS1 gene signature
-    - RS2 gene signature
-    - RS3 gene signature
-    - RS4 gene signature
+  - RS1 gene signature
+  - RS2 gene signature
+  - RS3 gene signature
+  - RS4 gene signature
 - Usage vignette
 
 ## Installation
